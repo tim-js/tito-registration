@@ -1,0 +1,18 @@
+{
+  "name": "tito-checkin",
+  "version": "0.0.0",
+  "description": "Improved checkin app for ti.to events, based on the order number, which is an auto-increment.",
+  "author": null,
+  "private": true,
+  "main": "node_modules/expo/AppEntry.js",
+  "dependencies": {
+    "expo": "^33.0.0",
+    "react": "16.8.3",
+    "react-dom": "^16.8.6",
+    "react-native": "https://github.com/expo/react-native/archive/sdk-33.0.0.tar.gz",
+    "react-native-paper": "2.2.8",
+    "react-native-web": "^0.11.4",
+    "react-navigation": "3.11.0",
+    "axios": "^0.18.0"
+  }
+}
