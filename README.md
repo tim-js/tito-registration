@@ -1,4 +1,8 @@
-# Sample Snack app
+# Tito-CHECKIN
+
+ Improved checkin app for ti.to events, based on the order number, which is an auto-increment.
+
+# App created using expo
 
 Welcome to Expo!
 
