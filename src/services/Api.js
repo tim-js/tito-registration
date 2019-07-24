@@ -1,5 +1,4 @@
 import axios from 'axios';
-import config from '../config';
 
 export default class Api {
     static create() {
@@ -7,8 +6,7 @@ export default class Api {
     }
   
     static requestErrorHandler(error) {
-      const customError = Api.parseError(error);
-      throw customError;
+      throw Api.parseError(error);
     }
   
     static parseError(error) {
@@ -21,6 +19,8 @@ export default class Api {
   
         if (error.response.status === 401) {
           message = 'Access denied.';
+        // } else if (error.response.status === 404) {
+        //   message = "Not found."
         } else if (error.response.data) {
           message = error.response.data.message || `Unknown error ${error.response.status}`;
           stack = error.response.data.stacktrace;
@@ -109,8 +109,11 @@ export default class Api {
   
     request(requestConfig, customHeaders) {
       Object.assign(requestConfig.headers, customHeaders);
+
       const req = axios(requestConfig);
+
       req.catch(Api.requestErrorHandler);
+
       return req;
     }
   }

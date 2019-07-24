@@ -1,4 +1,4 @@
-import Api from '.Api';
+import Api from './Api';
 import config from '../config';
 
 export default class TitoAdminApi {

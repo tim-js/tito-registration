@@ -1,0 +1,1 @@
+export const CHECKIN_LIST_SLUG = "CHECKIN_LIST_SLUG";

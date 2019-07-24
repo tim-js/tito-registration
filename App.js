@@ -1,27 +1,40 @@
-import React, { Component } from 'react';
+import React from 'react';
 import "react-native-gesture-handler";
-import {createStackNavigator, createAppContainer} from 'react-navigation';
-import Home from './src/components/Home'
-import CheckInList from './src/components/CheckInList'
-import Dashboard from './src/components/Dashboard'
-import QrScan from './src/components/QrScan'
+import { ThemeProvider } from 'react-native-elements';
+import { createRootNavigator } from "./src/router";
+import { createAppContainer } from 'react-navigation';
+import { Provider } from "react-redux";
+import store from "./src/redux/store";
+import {isSignedIn} from "./src/auth";
 
-const AppNavigator = createStackNavigator(
-  {
-    Home: Home,
-    CheckInList: CheckInList,
-    Dashboard: Dashboard,
-    QrScan: QrScan,
-  },
-  {
-    initialRouteName: "Home"
+export default class App extends React.Component  {
+  state = {
+    signedIn: false,
+    checkedSignIn: false
+  };
+
+  componentDidMount() {
+    if (isSignedIn()) {
+      this.setState({ signedIn: true, checkedSignIn: true });
+    }
   }
-);
 
-const AppContainer = createAppContainer(AppNavigator);
-
-export default class App extends Component {
   render() {
-   return <AppContainer />;
+    const { checkedSignIn, signedIn } = this.state;
+
+    const Layout = createRootNavigator(signedIn);
+    const Container = createAppContainer(Layout);
+    // If we haven't checked AsyncStorage yet, don't render anything
+    if (!checkedSignIn) {
+      return null;
+    }
+
+    return (
+        <ThemeProvider>
+          <Provider store={store}>
+            <Container/>
+          </Provider>
+        </ThemeProvider>
+    );
   }
 }
