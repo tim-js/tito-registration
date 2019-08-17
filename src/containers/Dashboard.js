@@ -33,10 +33,7 @@ class Dashboard extends Component {
           onPress={() => this.props.navigation.navigate('QrScan') }
         />
 
-        <Button
-          title="Sign Out"
-          onPress={() => this.signOut()}
-        />
+        <Button title=" Sign Out " onPress={() => this.signOut()} />
       </View>
     );
   }
