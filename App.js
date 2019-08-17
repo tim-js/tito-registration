@@ -13,10 +13,8 @@ export default class App extends React.Component  {
     checkedSignIn: false
   };
 
-  componentDidMount() {
-    if (isSignedIn()) {
-      this.setState({ signedIn: true, checkedSignIn: true });
-    }
+  async componentDidMount() {
+    this.setState({ signedIn: await isSignedIn(), checkedSignIn: true });
   }
 
   render() {
