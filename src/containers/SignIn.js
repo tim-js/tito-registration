@@ -19,9 +19,7 @@ class SignIn extends Component {
     const { checkinListSlug } = this.state;
     this.setState({ isLoading: true });
     try {
-      let response = await TitoCheckInApi.get(
-        `checkin_lists/${checkinListSlug}`
-      );
+      let response = await TitoCheckInApi.getList(checkinListSlug);
 
       if (response.status === 200) {
         this.props.setAccount(checkinListSlug);
