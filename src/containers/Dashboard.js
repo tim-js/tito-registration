@@ -152,7 +152,7 @@ const styles = StyleSheet.create({
   nrCheckins: {
     fontSize: 100,
     fontWeight: "bold",
-    color: "#03a9f4",
+    color: "#4caf50",
     textAlign: "center"
   },
   label: { textAlign: "center" },
@@ -165,14 +165,14 @@ const styles = StyleSheet.create({
     width: "100%",
     height: 14,
     borderWidth: 1,
-    borderColor: "#03a9f4",
+    borderColor: "#4caf50",
     borderRadius: 7,
     marginVertical: 20,
     padding: 2
   },
   progressInner: {
     height: 8,
-    backgroundColor: "#03a9f4",
+    backgroundColor: "#4caf50",
     borderRadius: 4,
     minWidth: 8
   }
