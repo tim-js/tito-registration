@@ -47,7 +47,6 @@ class Dashboard extends Component {
   }
 
   _renderContent = () => {
-    console.log(this.props.accountSettings);
     const { title, slug, tickets_count } = this.state.checkInList;
     const checkins_count = 2;
 
@@ -179,7 +178,7 @@ const styles = StyleSheet.create({
   }
 });
 
-const makeMapStateToProps = () => {
+const mapStateToProps = () => {
   return state => {
     return {
       accountSettings: state.accountSettings
@@ -193,6 +192,6 @@ const mapDispatchToProps = dispatch => ({
 });
 
 export default connect(
-  makeMapStateToProps,
+  mapStateToProps,
   mapDispatchToProps
 )(Dashboard);
