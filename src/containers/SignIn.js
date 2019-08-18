@@ -1,60 +1,56 @@
-import React, { Component } from 'react';
-import {
-  Text,
-  View,
-  StyleSheet,
-  TextInput,
-} from 'react-native';
+import React, { Component } from "react";
+import { View, StyleSheet, Alert } from "react-native";
 import TitoCheckInApi from "../services/TitoCheckInApi";
-import Constants from 'expo-constants';
-import { Button } from 'react-native-elements';
-import {setAccount} from "../redux/actions/account";
-import {connect} from "react-redux";
+import { Button, Input } from "react-native-elements";
+import { setAccount } from "../redux/actions/account";
+import { connect } from "react-redux";
 
 class SignIn extends Component {
   state = {
-    error: null,
-    checkinListSlug: null
+    checkinListSlug: "",
+    isLoading: false
   };
 
   static navigationOptions = {
-    title: 'Tito CheckIn',
+    title: "Tito CheckIn"
   };
 
   registerCheckInList = async () => {
+    const { checkinListSlug } = this.state;
+    this.setState({ isLoading: true });
     try {
-      let response = await TitoCheckInApi.get(`checkin_lists/${this.state.checkinListSlug}`);
-      if(response.status === 200) {
-        this.props.setAccount(this.state.checkinListSlug);
-        this.props.navigation.navigate('Dashboard');
+      let response = await TitoCheckInApi.get(
+        `checkin_lists/${checkinListSlug}`
+      );
+
+      if (response.status === 200) {
+        this.props.setAccount(checkinListSlug);
+        this.props.navigation.navigate("Dashboard");
       }
     } catch (e) {
-      console.log(e);
-      this.setState({ error: "Your checkin list slug cannot be found. Please review your slug and try again!" });
+      this.setState({ isLoading: false });
+      // console.log(e);
+      Alert.alert("Invalid Checkin List Slug");
     }
   };
 
   render() {
     return (
-       <View style={{ flex: 1, alignItems: 'center', justifyContent: 'center' }}>
-        <TextInput
-        style={{height: 40, borderColor: 'gray', borderWidth: 1}}
-        onChangeText={(checkinListSlug) => this.setState({checkinListSlug: checkinListSlug})}
-        placeholder="Your CheckIn list slug"
+      <View style={styles.container}>
+        <Input
+          label="ti.to Check-in List Slug"
+          value={this.state.checkinListSlug}
+          onChangeText={checkinListSlug =>
+            this.setState({ checkinListSlug: checkinListSlug })
+          }
+          containerStyle={styles.input}
         />
 
-         <Text>
-         { this.state.error != null ?
-           this.state.error
-           :
-           ''
-         }
-         </Text>
-
-        <Text>Enter your checkIn list slug for using the app. This can be changed anytime in your settings page.</Text>
         <Button
-          title="Register checkIn list"
-          onPress={() => this.registerCheckInList() }
+          title="Register"
+          onPress={() => this.registerCheckInList()}
+          loading={this.state.isLoading}
+          disabled={this.state.isLoading}
         />
       </View>
     );
@@ -64,21 +60,22 @@ class SignIn extends Component {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    alignItems: 'center',
-    justifyContent: 'center',
-    paddingTop: Constants.statusBarHeight,
-    backgroundColor: '#ecf0f1',
+    justifyContent: "center",
+    padding: 20
   },
+  input: {
+    marginTop: 5,
+    marginBottom: 30,
+    paddingHorizontal: 0
+  }
 });
-
 
 const mapStateToProps = () => ({});
 const mapDispatchToProps = dispatch => ({
-  setAccount: checkinListSlug => dispatch(setAccount(checkinListSlug)),
+  setAccount: checkinListSlug => dispatch(setAccount(checkinListSlug))
 });
 
 export default connect(
   mapStateToProps,
-  mapDispatchToProps,
+  mapDispatchToProps
 )(SignIn);
-
