@@ -1,5 +1,6 @@
 import React, { Component } from "react";
 import { View, StyleSheet, Text, TouchableOpacity } from "react-native";
+import { Button } from "react-native-elements";
 
 import TitoCheckInApi from "../services/TitoCheckInApi";
 // import { clearAccount, getAccountSettings } from "../redux/actions/account";
@@ -62,24 +63,39 @@ class CheckInList extends Component {
     }
 
     return (
-      <>
-        <Text style={styles.title}>{title}</Text>
-        <Text style={styles.subtitle}>{slug}</Text>
-
-        <TouchableOpacity
-          onPress={() => this.props.navigation.navigate("CheckIns")}
-        >
-          <Text style={styles.nrCheckins}>{checkins_count}</Text>
-          <Text style={styles.label}>Checkins</Text>
-        </TouchableOpacity>
-
-        <View style={styles.progressOuter}>
-          <View style={[styles.progressInner, { width: percent }]} />
+      <View
+        style={{
+          flex: 1,
+          justifyContent: "space-around",
+          paddingVertical: 50
+        }}
+      >
+        <View>
+          <Text style={styles.title}>{title}</Text>
+          <Text style={styles.subtitle}>{slug}</Text>
         </View>
 
-        <Text style={styles.nrTickets}>{tickets_count}</Text>
-        <Text style={styles.label}>Total Tickets</Text>
-      </>
+        <View>
+          <TouchableOpacity
+            onPress={() => this.props.navigation.navigate("CheckIns")}
+          >
+            <Text style={styles.nrCheckins}>{checkins_count}</Text>
+            <Text style={styles.label}>Checkins</Text>
+          </TouchableOpacity>
+
+          <View style={styles.progressOuter}>
+            <View style={[styles.progressInner, { width: percent }]} />
+          </View>
+
+          <Text style={styles.nrTickets}>{tickets_count}</Text>
+          <Text style={styles.label}>Total Tickets</Text>
+        </View>
+
+        <Button
+          title="Scan Ticket"
+          onPress={() => this.props.navigation.navigate("QrScan")}
+        />
+      </View>
     );
   };
 
@@ -110,7 +126,6 @@ const styles = StyleSheet.create({
   },
   subtitle: {
     color: "#888888",
-    marginBottom: 50,
     textAlign: "center"
   },
   nrCheckins: {
