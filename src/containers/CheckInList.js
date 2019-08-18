@@ -3,7 +3,7 @@ import { View, StyleSheet, Text, TouchableOpacity } from "react-native";
 import { Button } from "react-native-elements";
 
 import TitoCheckInApi from "../services/TitoCheckInApi";
-// import { clearAccount, getAccountSettings } from "../redux/actions/account";
+import { clearAccount, getAccountSettings } from "../redux/actions/account";
 import { connect } from "react-redux";
 import Loader from "../components/Loader";
 
@@ -14,8 +14,14 @@ class CheckInList extends Component {
     error: null
   };
 
-  componentDidMount = () => {
+  async componentDidMount() {
+    await this.props.getAccountSettings();
     this.getCheckInList();
+  }
+
+  signOut = () => {
+    this.props.signOut();
+    this.props.navigation.navigate("SignIn");
   };
 
   getCheckInList = async () => {
@@ -43,16 +49,13 @@ class CheckInList extends Component {
   }
 
   _renderContent = () => {
-    const {
-      title,
-      slug,
-      tickets_count,
-      checkins_count
-    } = this.state.checkInList;
+    const { title, slug, tickets_count } = this.state.checkInList;
+    const checkins_count = 2;
 
     const { isLoading, error } = this.state;
 
-    const percent = (checkins_count * 100) / tickets_count;
+    const percent =
+      tickets_count > 0 ? (checkins_count * 100) / tickets_count : 0;
 
     if (isLoading) {
       return <Loader text="Fetching CheckIn List" />;
@@ -83,18 +86,24 @@ class CheckInList extends Component {
             <Text style={styles.label}>Checkins</Text>
           </TouchableOpacity>
 
-          <View style={styles.progressOuter}>
-            <View style={[styles.progressInner, { width: percent }]} />
-          </View>
+          {this._renderProgress(percent)}
 
           <Text style={styles.nrTickets}>{tickets_count}</Text>
           <Text style={styles.label}>Total Tickets</Text>
         </View>
 
-        <Button
-          title="Scan Ticket"
-          onPress={() => this.props.navigation.navigate("QrScan")}
-        />
+        <View>
+          <Button
+            title="Scan Ticket"
+            onPress={() => this.props.navigation.navigate("QrScan")}
+          />
+          <Button
+            containerStyle={{ marginTop: 20 }}
+            type="clear"
+            title="Sign Out"
+            onPress={() => this.signOut()}
+          />
+        </View>
       </View>
     );
   };
@@ -107,6 +116,14 @@ class CheckInList extends Component {
           "{this.props.accountSettings.checkinListSlug}"
         </Text>
         <Text>{error}</Text>
+      </View>
+    );
+  };
+
+  _renderProgress = percent => {
+    return (
+      <View style={styles.progressOuter}>
+        <View style={[styles.progressInner, { width: `${percent}%` }]} />
       </View>
     );
   };
@@ -142,16 +159,18 @@ const styles = StyleSheet.create({
   },
   progressOuter: {
     width: "100%",
-    height: 12,
+    height: 14,
     borderWidth: 1,
     borderColor: "#03a9f4",
-    borderRadius: 6,
-    marginVertical: 20
+    borderRadius: 7,
+    marginVertical: 20,
+    padding: 2
   },
   progressInner: {
-    height: 10,
+    height: 8,
     backgroundColor: "#03a9f4",
-    borderRadius: 5
+    borderRadius: 4,
+    minWidth: 8
   }
 });
 
@@ -164,7 +183,8 @@ const makeMapStateToProps = () => {
 };
 
 const mapDispatchToProps = dispatch => ({
-  // getAccountSettings: () => dispatch(getAccountSettings())
+  signOut: () => dispatch(clearAccount()),
+  getAccountSettings: () => dispatch(getAccountSettings())
 });
 
 export default connect(
