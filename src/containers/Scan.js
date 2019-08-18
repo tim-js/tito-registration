@@ -5,6 +5,7 @@ import * as Permissions from "expo-permissions";
 import Constants from "expo-constants";
 import TitoCheckInApi from "../services/TitoCheckInApi";
 import TitoAdminApi from "../services/TitoAdminApi";
+import Loader from "../components/Loader";
 
 import { Button } from "react-native-elements";
 import { getAccountSettings } from "../redux/actions/account";
@@ -120,7 +121,7 @@ class Scan extends Component {
     return (
       <View style={{ flex: 1, alignItems: "center", justifyContent: "center" }}>
         {this.state.hasCameraPermission === null ? (
-          <Text>Requesting for camera permission</Text>
+          <Loader text="Requesting for camera permission" />
         ) : this.state.hasCameraPermission === false ? (
           <Text>Camera permission is not granted</Text>
         ) : (
@@ -143,7 +144,7 @@ class Scan extends Component {
             style={{ flex: 1, alignItems: "center", justifyContent: "center" }}
           >
             {this.state.isLoading ? (
-              <ActivityIndicator size="large" color="#0000ff" />
+              <Loader />
             ) : (
               <>
                 {Scan._renderTicket(

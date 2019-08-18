@@ -5,6 +5,7 @@ import { connect } from "react-redux";
 import Constants from "expo-constants";
 
 import TitoCheckInApi from "../services/TitoCheckInApi";
+import Loader from "../components/Loader";
 
 class CheckIns extends Component {
   state = {
@@ -24,7 +25,6 @@ class CheckIns extends Component {
       );
 
       this.setState({ checkIns: response.data });
-      console.log(response.data);
     } catch (e) {
       this.setState({ error: error.message });
     } finally {
@@ -38,7 +38,7 @@ class CheckIns extends Component {
         <View style={styles.statusBar} />
 
         {this.state.isLoading ? (
-          <Text>Waiting for data</Text>
+          <Loader />
         ) : this.state.error === null ? (
           this._renderlist(this.state.checkIns)
         ) : (
