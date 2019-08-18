@@ -1,11 +1,10 @@
 import React from "react";
-import { Text } from "react-native";
-import { Button } from "react-native-elements";
+import { Text, ActivityIndicator } from "react-native";
 
 const Loader = ({ text = "Please wait..." }) => {
   return (
     <>
-      <Button type="clear" loading disabled />
+      <ActivityIndicator />
       <Text>{text}</Text>
     </>
   );
