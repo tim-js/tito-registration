@@ -71,9 +71,7 @@ class Scan extends Component {
 
     const [ticketData, checkIns] = await Promise.all([
       TitoAdminApi.get(`revojs/revojs2019/tickets/${slug}`, {}, headers),
-      TitoCheckInApi.get(
-        `checkin_lists/${this.props.accountSettings.checkinListSlug}/checkins`
-      )
+      TitoCheckInApi.getCheckins(this.props.accountSettings.checkinListSlug)
     ]);
 
     const { ticket } = ticketData.data;

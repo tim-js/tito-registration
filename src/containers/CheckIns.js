@@ -21,16 +21,19 @@ export default class CheckIns extends Component {
     this.getCheckIns();
   };
 
-  getCheckIns = () => {
-    TitoCheckInApi.get(`checkin_lists/${this.props.navigation.getParam('checkinListSlug')}/checkins`).then(response => {
+  getCheckIns = async () => {
+    try {
+      const response = await TitoCheckInApi.getCheckins(
+        this.props.accountSettings.checkinListSlug
+      );
+
       this.setState({ checkIns: response.data });
+      console.log(response.data);
+    } catch (e) {
+      this.setState({ error: error.message });
+    } finally {
       this.setState({ isLoading: false });
-    }).catch(error => {
-      if(error.response && error.response.status === 404){
-        this.setState({ error: error.message });
-        this.setState({ isLoading: false });
-      }
-    })
+    }
   };
 
   render() {
