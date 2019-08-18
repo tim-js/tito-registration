@@ -6,6 +6,7 @@ import Constants from "expo-constants";
 import TitoCheckInApi from "../services/TitoCheckInApi";
 import TitoAdminApi from "../services/TitoAdminApi";
 import Loader from "../components/Loader";
+import { Ionicons } from "@expo/vector-icons";
 
 import { Button } from "react-native-elements";
 import { getAccountSettings } from "../redux/actions/account";
@@ -140,16 +141,49 @@ class Scan extends Component {
               <Loader />
             ) : (
               <>
-                {Scan._renderTicket(
-                  this.state.ticket,
-                  this.state.checkinAvailable
-                )}
+                {Scan._renderTicket(this.state.ticket)}
 
-                <Button onPress={() => this.hideModal()} title="Scan Again" />
+                <View style={{ marginBottom: 20 }}>
+                  {this.state.ticket && this.state.checkinAvailable ? (
+                    <Button
+                      icon={
+                        <Ionicons
+                          name="md-checkmark-circle-outline"
+                          size={25}
+                          color="#ffffff"
+                          style={{ marginRight: 20 }}
+                        />
+                      }
+                      onPress={() => this.checkin(this)}
+                      title="Check In"
+                      titleStyle={{ fontSize: 25 }}
+                      buttonStyle={{
+                        backgroundColor: "#4caf50",
+                        paddingHorizontal: 20
+                      }}
+                    />
+                  ) : (
+                    <Text
+                      style={{
+                        fontSize: 30,
+                        textAlign: "center",
+                        color: "#4caf50",
+                        fontWeight: "bold",
+                        width: "100%"
+                      }}
+                    >
+                      Already Checked In{" "}
+                    </Text>
+                  )}
+                </View>
 
-                {this.state.ticket && this.state.checkinAvailable && (
-                  <Button onPress={() => this.checkin(this)} title="Check In" />
-                )}
+                <Button
+                  onPress={() => this.hideModal()}
+                  title="Scan Again"
+                  titleStyle={{ fontSize: 20 }}
+                  buttonStyle={{ paddingHorizontal: 20 }}
+                  type="clear"
+                />
               </>
             )}
           </View>
@@ -158,44 +192,36 @@ class Scan extends Component {
     );
   }
 
-  static _renderTicket(ticket, checkinAvailable) {
+  static _renderTicket(ticket) {
     if (!ticket) {
       return <Text>No ticket data</Text>;
     }
 
-    const { first_name, last_name, number } = ticket;
+    const { first_name, last_name, number, reference } = ticket;
     return (
       <>
-        {checkinAvailable ? (
-          <Text style={{ fontSize: 50 }}>Available for check in</Text>
-        ) : (
-          <Text style={{ fontSize: 50 }}>Ticket checked in</Text>
-        )}
-
-        <Text style={{ fontSize: 200 }}>{number}</Text>
-        <Text style={{ fontSize: 30 }}>
-          {first_name} {last_name}
+        <Text
+          style={{ fontSize: 150, fontWeight: "bold", textAlign: "center" }}
+        >
+          {number}
+        </Text>
+        <Text
+          style={{
+            fontSize: 30,
+            fontWeight: "bold",
+            textAlign: "center",
+            width: "100%"
+          }}
+        >
+          {first_name} {last_name}{" "}
+        </Text>
+        <Text style={{ fontSize: 30, marginBottom: 50, color: "#888888" }}>
+          {reference}
         </Text>
       </>
     );
   }
 }
-
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    alignItems: "center",
-    justifyContent: "center",
-    paddingTop: Constants.statusBarHeight,
-    backgroundColor: "#ecf0f1",
-    margin: "auto"
-  },
-  ticket_number: {
-    alignItems: "center",
-    justifyContent: "center",
-    fontSize: 50
-  }
-});
 
 const makeMapStateToProps = () => {
   return state => {
