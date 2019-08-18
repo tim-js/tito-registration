@@ -12,7 +12,10 @@ class SignIn extends Component {
   };
 
   static navigationOptions = {
-    title: "Tito CheckIn"
+    title: "Tito CheckIn",
+    headerTitleStyle: {
+      width: "100%"
+    }
   };
 
   registerCheckInList = async () => {
