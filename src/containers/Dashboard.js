@@ -47,8 +47,12 @@ class Dashboard extends Component {
   }
 
   _renderContent = () => {
-    const { title, slug, tickets_count } = this.state.checkInList;
-    const checkins_count = 2;
+    const {
+      title,
+      slug,
+      checkins_count,
+      tickets_count
+    } = this.state.checkInList;
 
     const { isLoading, error } = this.state;
 
@@ -125,11 +129,12 @@ class Dashboard extends Component {
   };
 
   _renderProgress = percent => {
-    return (
-      <View style={styles.progressOuter}>
+    const inner =
+      percent > 0 ? (
         <View style={[styles.progressInner, { width: `${percent}%` }]} />
-      </View>
-    );
+      ) : null;
+
+    return <View style={styles.progressOuter}>{inner}</View>;
   };
 }
 
