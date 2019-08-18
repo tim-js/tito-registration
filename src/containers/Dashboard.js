@@ -94,7 +94,7 @@ class Dashboard extends Component {
         <View>
           <Button
             title="Scan Ticket"
-            onPress={() => this.props.navigation.navigate("QrScan")}
+            onPress={() => this.props.navigation.navigate("Scan")}
           />
           <Button
             containerStyle={{ marginTop: 20 }}
