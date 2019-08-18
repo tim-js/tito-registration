@@ -11,4 +11,13 @@ export default class TitoCheckInApi {
       `${config.TITO_CHECKIN_API_URL}checkin_lists/${slug}/checkins`
     );
   }
+
+  static checkinTicket(slug, ticketId) {
+    return Api.post(
+      `${config.TITO_CHECKIN_API_URL}checkin_lists/${slug}/checkins`,
+      {
+        checkin: { ticket_id: ticketId }
+      }
+    );
+  }
 }

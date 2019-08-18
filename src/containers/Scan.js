@@ -62,8 +62,8 @@ class Scan extends Component {
 
     this.setState({ scanResult: qrData });
 
-    let splicedURI = qrData.data.split("/");
-    let slug = splicedURI[splicedURI.length - 1];
+    const splicedURI = qrData.data.split("/");
+    const slug = splicedURI[splicedURI.length - 1];
 
     const headers = {
       Accept: "application/json",
@@ -77,37 +77,30 @@ class Scan extends Component {
 
     const { ticket } = ticketData.data;
 
-    this.setState({ ticket: ticket });
-    this.setState({ checkIns: checkIns.data });
+    const isCheckedIn = this.getTicketStatus(checkIns.data, ticket.id);
 
-    this.checkTicketStatus();
-
-    this.setState({ isLoading: false });
+    this.setState({
+      ticket,
+      checkIns: checkIns.data,
+      isLoading: false,
+      checkinAvailable: !isCheckedIn
+    });
   };
 
-  checkTicketStatus = () => {
-    const checkins = this.state.checkIns;
-    const ticketId = this.state.ticket.id;
-
-    if (checkins.some(checkin => checkin.ticket_id === ticketId)) {
-      this.setState({ checkinAvailable: false });
-    } else {
-      this.setState({ checkinAvailable: true });
-    }
+  getTicketStatus = (checkins, ticketId) => {
+    return checkins.some(checkin => checkin.ticket_id === ticketId);
   };
 
   checkin(modal) {
     let ticketId = parseInt(this.state.ticket.release_id);
 
-    TitoCheckInApi.post(
-      `checkin_lists/${this.props.accountSettings.checkinListSlug}/checkins`,
-      { checkin: { ticket_id: ticketId } }
+    TitoCheckInApi.checkinTicket(
+      this.props.accountSettings.checkinListSlug,
+      ticketId
     )
       .then(() => {
         modal.hideModal();
-        this.props.navigation.navigate("CheckInList", {
-          checkinListSlug: this.state.checkinListSlug
-        });
+        this.props.navigation.navigate("CheckInList");
       })
       .catch(error => {
         console.log(error);
@@ -127,7 +120,7 @@ class Scan extends Component {
         ) : (
           <BarCodeScanner
             barCodeTypes={[BarCodeScanner.Constants.BarCodeType.qr]}
-            style={{ height: 1000, width: 1000 }}
+            style={StyleSheet.absoluteFillObject}
             onBarCodeScanned={this._handleBarCodeRead}
           />
         )}
@@ -154,10 +147,8 @@ class Scan extends Component {
 
                 <Button onPress={() => this.hideModal()} title="Scan Again" />
 
-                {this.state.ticket && this.state.checkinAvailable ? (
+                {this.state.ticket && this.state.checkinAvailable && (
                   <Button onPress={() => this.checkin(this)} title="Check In" />
-                ) : (
-                  <Text />
                 )}
               </>
             )}
