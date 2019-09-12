@@ -2,19 +2,20 @@ import Api from './Api';
 import config from '../config';
 
 export default class TitoAdminApi {
-  static post(route, data, params = {}, customHeaders = {}) {
-    return Api.create().post(`${config.TITO_ADMIN_API_URL}${route}`, data, params, customHeaders);
+  static getEvents(apiKey, teamSlug) {
+    return Api.get(`${config.TITO_ADMIN_API_URL}/${teamSlug}/events`, {}, { 'Authorization': `Token token=${apiKey}` });
   }
 
-  static get(route, data = {}, customHeaders = {}) {
-    return Api.create().get(`${config.TITO_ADMIN_API_URL}${route}`, data, customHeaders);
+  static getCheckinLists(apiKey, teamSlug, eventSlug) {
+    return Api.get(`${config.TITO_ADMIN_API_URL}/${teamSlug}/${eventSlug}/checkin_lists`, {}, { 'Authorization': `Token token=${apiKey}` });
   }
 
-  static put(route, data, customHeaders = {}) {
-  return Api.create().put(`${config.TITO_ADMIN_API_URL}${route}`, data, customHeaders);
+  static getTicketData(apiKey, teamSlug, eventSlug, ticketSlug) {
+    return Api.get(`${config.TITO_ADMIN_API_URL}/${teamSlug}/${eventSlug}/tickets/${ticketSlug}`, {}, { 'Authorization': `Token token=${apiKey}` });
   }
 
-  static delete(route, data, params, customHeaders = {}) {
-    return Api.create().delete(`${config.TITO_ADMIN_API_URL}${route}`, data, params, customHeaders);
-  }
+
+
+
+
 }

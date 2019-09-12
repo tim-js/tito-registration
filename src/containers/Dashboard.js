@@ -1,22 +1,25 @@
-import React, { Component } from "react";
-import { View, StyleSheet, Text, TouchableOpacity } from "react-native";
-import { Button } from "react-native-elements";
+import React, {Component} from "react";
+import {StyleSheet, Text, TouchableOpacity, View, Alert} from "react-native";
+import {Button} from "react-native-elements";
 
 import TitoCheckInApi from "../services/TitoCheckInApi";
-import { clearAccount, getAccountSettings } from "../redux/actions/account";
-import { connect } from "react-redux";
+import {clearAccount, getAccountSettings} from "../redux/actions/account";
+import {connect} from "react-redux";
 import Loader from "../components/Loader";
 
 class Dashboard extends Component {
   state = {
     isLoading: true,
-    checkInList: {},
-    error: null
+    error: null,
+    checkInList: {}
   };
 
   componentDidMount = async () => {
-    const { checkinListSlug } = await this.props.getAccountSettings();
-    await this.getCheckInList(checkinListSlug);
+    await this.props.getAccountSettings();
+
+    console.log(this.props);
+
+    await this.getCheckInList();
   };
 
   signOut = () => {
@@ -24,9 +27,10 @@ class Dashboard extends Component {
     this.props.navigation.navigate("SignIn");
   };
 
-  getCheckInList = async slug => {
+  getCheckInList = async() => {
+    console.log(this.props.accountSettings.checkinListSlug);
     try {
-      let response = await TitoCheckInApi.getList(slug);
+      let response = await TitoCheckInApi.getList(this.props.accountSettings.checkinListSlug);
       if (response.status === 200) {
         this.setState({ checkInList: response.data });
       }
@@ -184,11 +188,9 @@ const styles = StyleSheet.create({
 });
 
 const mapStateToProps = () => {
-  return state => {
-    return {
-      accountSettings: state.accountSettings
-    };
-  };
+  return state => ({
+    ...state.accountSettings
+  });
 };
 
 const mapDispatchToProps = dispatch => ({

@@ -8,6 +8,8 @@ import SignIn from "./containers/SignIn";
 import Dashboard from "./containers/Dashboard";
 import Scan from "./containers/Scan";
 import CheckIns from "./containers/CheckIns";
+import CheckinList from "./containers/CheckinList"
+import Events from "./containers/Events"
 import * as StatusBar from "react-native";
 import Platform from "react-native";
 
@@ -66,7 +68,33 @@ export const SignedIn = createBottomTabNavigator(
           />
         )
       }
-    }
+    },
+    CheckinList: {
+      screen: CheckinList,
+      navigationOptions: {
+        tabBarIcon: ({ tintColor }) => (
+          <Ionicons
+            name="md-checkmark-circle-outline"
+            size={20}
+            color={tintColor}
+            style={{ marginTop: 6 }}
+          />
+        )
+      }
+    },
+    Events: {
+      screen: Events,
+      navigationOptions: {
+        tabBarIcon: ({ tintColor }) => (
+          <Ionicons
+            name="md-checkmark-circle-outline"
+            size={20}
+            color={tintColor}
+            style={{ marginTop: 6 }}
+          />
+        )
+      }
+    },
   },
   {
     tabBarOptions: {

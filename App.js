@@ -5,7 +5,7 @@ import { createRootNavigator } from "./src/router";
 import { createAppContainer } from 'react-navigation';
 import { Provider } from "react-redux";
 import store from "./src/redux/store";
-import {isSignedIn} from "./src/auth";
+import { isSignedIn } from "./src/auth";
 
 export default class App extends React.Component  {
   state = {
@@ -20,12 +20,13 @@ export default class App extends React.Component  {
   render() {
     const { checkedSignIn, signedIn } = this.state;
 
-    const Layout = createRootNavigator(signedIn);
-    const Container = createAppContainer(Layout);
     // If we haven't checked AsyncStorage yet, don't render anything
     if (!checkedSignIn) {
       return null;
     }
+
+    const Layout = createRootNavigator(signedIn);
+    const Container = createAppContainer(Layout);
 
     return (
         <ThemeProvider>

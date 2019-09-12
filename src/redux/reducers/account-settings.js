@@ -1,28 +1,24 @@
-import {GET_ACCOUNT_SETTINGS, SET_ACCOUNT_SETTINGS, CLEAR_ACCOUNT_SETTINGS} from '../action-types';
+import {GET_ACCOUNT_SETTINGS, SET_ACCOUNT_SETTINGS, CLEAR_ACCOUNT_SETTINGS, SET_EVENT_SLUG, GET_EVENT_SLUG} from '../action-types';
 const initialState = { accountSettings: {} };
 
-export default function(state = {}, action) {
+export default function(state = initialState, action) {
   switch (action.type) {
     case SET_ACCOUNT_SETTINGS: {
       return {
         ...state,
-        apiKey: action.accountSettings.apiKey,
-        teamSlug: action.accountSettings.teamSlug,
-        checkinListSlug: action.accountSettings.checkinListSlug,
+        accountSettings: action.accountSettings
       }
     }
     case CLEAR_ACCOUNT_SETTINGS: {
       return {
         ...state,
-        apiKey: null,
-        teamSlug: null,
-        checkinListSlug: null,
+        accountSettings: {}
       }
     }
-    case GET_ACCOUNT_SETTINGS: {
+    case SET_EVENT_SLUG: {
       return {
         ...state,
-        checkinListSlug: action.accountSettings.checkinListSlug,
+        eventSlug: action.eventSlug
       }
     }
     default:

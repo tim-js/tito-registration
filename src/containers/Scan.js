@@ -66,13 +66,12 @@ class Scan extends Component {
     const splicedURI = qrData.data.split("/");
     const slug = splicedURI[splicedURI.length - 1];
 
-    const headers = {
-      Accept: "application/json",
-      Authorization: "Token token=secret_live_kBSSKszg7XcZm-zuiwMD"
-    };
-
     const [ticketData, checkIns] = await Promise.all([
-      TitoAdminApi.get(`revojs/revojs2019/tickets/${slug}`, {}, headers),
+      TitoAdminApi.getTicketData(
+        this.props.accountSettings.apiKey,
+        this.props.accountSettings.apiKey,
+        this.props.eventSlug,
+        slug),
       TitoCheckInApi.getCheckins(this.props.accountSettings.checkinListSlug)
     ]);
 
@@ -226,7 +225,8 @@ class Scan extends Component {
 const makeMapStateToProps = () => {
   return state => {
     return {
-      accountSettings: state.accountSettings
+      ...state.accountSettings,
+      eventSlug: state.accountSettings.eventSlug
     };
   };
 };
