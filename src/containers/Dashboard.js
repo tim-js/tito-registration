@@ -28,7 +28,6 @@ class Dashboard extends Component {
   };
 
   getCheckInList = async() => {
-    console.log(this.props.accountSettings.checkinListSlug);
     try {
       let response = await TitoCheckInApi.getList(this.props.accountSettings.checkinListSlug);
       if (response.status === 200) {
@@ -45,7 +44,6 @@ class Dashboard extends Component {
     return (
       <View style={styles.container}>
         {this._renderContent()}
-        {/*<ListView dataSource={this.state.checkInList} renderRow={(rowData) => <Text>{rowData}</Text>}/>*/}
       </View>
     );
   }

@@ -72,7 +72,7 @@ class Scan extends Component {
         this.props.accountSettings.apiKey,
         this.props.eventSlug,
         slug),
-      TitoCheckInApi.getCheckins(this.props.accountSettings.checkinListSlug)
+      this.getCheckins()
     ]);
 
     const { ticket } = ticketData.data;
@@ -85,6 +85,17 @@ class Scan extends Component {
       isLoading: false,
       checkinAvailable: !isCheckedIn
     });
+  };
+
+  getCheckins = async (pageNumber = 1) => {
+    let results = await TitoCheckInApi.getCheckins(this.props.accountSettings.checkinListSlug, pageNumber);
+    let nextPage = results.data.meta.next_page;
+
+    if(nextPage) {
+      return results.data.concat(await this.getCheckins(nextPage));
+    } else {
+      return results.data
+    }
   };
 
   getTicketStatus = (checkins, ticketId) => {

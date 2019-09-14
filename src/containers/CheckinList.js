@@ -62,15 +62,17 @@ class CheckinList extends Component {
     return (
       <ScrollView style={{ flex: 1, width: "100%" }}>
         {list.map(checkinList => (
-          <ListItem
-            key={checkinList.slug}
-            title={checkinList.title}
-            subtitle={checkinList.slug}
-            topDivider
-            subtitleStyle={{ color: "#888888" }}
-            onPress={ async () => await this.saveCheckinListSlug(checkinList.slug) }
-          />
-        ))}
+            <ListItem
+              key={checkinList.slug}
+              title={checkinList.title}
+              subtitle={checkinList.slug}
+              titleStyle={ checkinList.slug === this.props.accountSettings.checkinListSlug ? { color: "#1046af" } : { color: "#888888" } }
+              subtitleStyle={ checkinList.slug === this.props.accountSettings.checkinListSlug ? { color: "#4caf50" } : { color: "#888888" } }
+              topDivider
+              onPress={ async () => await this.saveCheckinListSlug(checkinList.slug) }
+            />
+          )
+        )}
       </ScrollView>
     );
   };

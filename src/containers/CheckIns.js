@@ -7,19 +7,24 @@ import Constants from "expo-constants";
 import TitoCheckInApi from "../services/TitoCheckInApi";
 import Loader from "../components/Loader";
 import TitoAdminApi from "../services/TitoAdminApi";
+import {getEventSlug} from "../redux/actions/account";
 
 class CheckIns extends Component {
   state = {
     isLoading: true,
     checkIns: [],
+    tickets: [],
     error: null
   };
 
   componentDidMount = async () => {
+    await this.props.getEventSlug();
+    await this.getAllTickets();
     await this.getCheckIns();
   };
 
   getCheckIns = async () => {
+    this.setState({ isLoading: true });
     try {
       const response = await TitoCheckInApi.getCheckins(
         this.props.accountSettings.checkinListSlug
@@ -33,6 +38,35 @@ class CheckIns extends Component {
       this.setState({ isLoading: false });
     }
   };
+
+  getAllTickets = async () => {
+    this.setState({ isLoading: true });
+    try {
+      let tickets = await this.getTickets();
+      this.setState({ allTickets: tickets });
+    } catch (e) {
+      this.setState({ error: e.message });
+    } finally {
+      this.setState({ isLoading: false });
+    }
+  };
+
+  getTickets = async (pageNumber = 1) => {
+    let results = await TitoAdminApi.getAllTickets(this.props.accountSettings.apiKey, this.props.accountSettings.teamSlug, this.props.eventSlug, pageNumber);
+    let nextPage = results.data.meta.next_page;
+
+    if(nextPage) {
+      return results.data.tickets.concat(await this.getTickets(nextPage));
+    } else {
+      return results.data.tickets
+    }
+  };
+
+  addUserDataToList = async list => {
+    let listIds = list.map(checkin => checkin.ticket_id);
+    return this.state.allTickets.filter(ticket => listIds.includes(ticket.id));
+  };
+
 
   render() {
     return (
@@ -50,27 +84,10 @@ class CheckIns extends Component {
     );
   }
 
-  addUserDataToList = async (list) => {
-    //@todo -> get the ticket by id if it's possible, and get the ticket Slug to use it in here :)
-    return list.map(checkin => Object.assign({}, checkin, this.getUserDataFromTicket(checkin.ticket_id)));
-  };
-
-  getUserDataFromTicket = async (ticketId) => {
-    return await TitoAdminApi.getTicketData(
-      this.props.accountSettings.apiKey,
-      this.props.accountSettings.apiKey,
-      this.props.eventSlug,
-      ticketId
-    )
-  };
-
   _renderList = list => {
     if (!list.length) {
       return <Text>No checkins yet</Text>;
     }
-
-    // @Todo each ticked_id should be queried again to be able to show the name and ticket identification
-    console.log(list);
 
     return (
       <ScrollView style={{ flex: 1, width: "100%" }}>
@@ -78,8 +95,8 @@ class CheckIns extends Component {
           (
           <ListItem
             key={checkin.id}
-            title={`${checkin.full_name} ${checkin.id}`}
-            subtitle={`${checkin.ticket_id}`}
+            title={`${checkin.first_name} ${checkin.last_name}` }
+            subtitle={`${checkin.number}`}
             topDivider
             subtitleStyle={{ color: "#888888" }}
           />
@@ -99,12 +116,15 @@ const styles = StyleSheet.create({
 const mapStateToProps = () => {
   return state => {
     return {
-      ...state.accountSettings
+      ...state.accountSettings,
+      eventSlug: state.accountSettings.eventSlug
     };
   };
 };
 
-const mapDispatchToProps = dispatch => ({});
+const mapDispatchToProps = dispatch => ({
+  getEventSlug: () => dispatch(getEventSlug())
+});
 
 export default connect(
   mapStateToProps,
