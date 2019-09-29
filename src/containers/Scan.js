@@ -11,6 +11,7 @@ import { Ionicons } from "@expo/vector-icons";
 import { Button } from "react-native-elements";
 import { getAccountSettings } from "../redux/actions/account";
 import { connect } from "react-redux";
+import {withNavigationFocus} from "react-navigation";
 
 class Scan extends Component {
   state = {
@@ -21,7 +22,9 @@ class Scan extends Component {
     checkinListSlug: null,
     checkIns: [],
     checkinAvailable: null,
-    isLoading: false
+    isLoading: false,
+    totalPages: 1,
+    error: null
   };
 
   static navigationOptions = {
@@ -40,10 +43,21 @@ class Scan extends Component {
     });
   }
 
-  componentDidMount() {
-    this.props.getAccountSettings();
-    this._requestCameraPermission();
-  }
+  componentDidMount = async () => {
+    await this.loadData();
+    await this._requestCameraPermission();
+  };
+
+  componentDidUpdate = async (prevProps) => {
+    if (prevProps.isFocused !== this.props.isFocused) {
+      await this.loadData();
+    }
+  };
+
+  loadData = async () => {
+    await this.props.getAccountSettings();
+    await this.getPages();
+  };
 
   _requestCameraPermission = async () => {
     const { status } = await Permissions.askAsync(Permissions.CAMERA);
@@ -66,22 +80,31 @@ class Scan extends Component {
     const splicedURI = qrData.data.split("/");
     const slug = splicedURI[splicedURI.length - 1];
 
-    const [ticketData, checkIns] = await Promise.all([
-      TitoAdminApi.getTicketData(
-        this.props.accountSettings.apiKey,
-        this.props.accountSettings.apiKey,
-        this.props.eventSlug,
-        slug),
-      this.getCheckins()
-    ]);
+    const ticketData = await TitoAdminApi.getTicketData(
+      this.props.accountSettings.apiKey,
+      this.props.accountSettings.teamSlug,
+      this.props.eventSlug,
+      slug
+    );
 
-    const { ticket } = ticketData.data;
+    const checkIns = await this.getCheckins();
+    let ticket = ticketData.data.ticket;
 
-    const isCheckedIn = this.getTicketStatus(checkIns.data, ticket.id);
+    let isCheckedIn;
+    try{
+      await TitoCheckInApi.getTicket(this.props.accountSettings.checkinListSlug, ticket.slug);
+      isCheckedIn = await this.getTicketStatus(checkIns, ticket.id);
+      this.setState({error: null});
+    } catch(e) {
+      alert("The ticket is not from this checkin list");
+      // this.setState({error: `Ticket: ${ticket.first_name} ${ticket.last_name} - ${ticket.number} is not available for checkin`});
+      this.setState({error: `Not found in this checkin list`});
+      ticket = null;
+    }
 
     this.setState({
       ticket,
-      checkIns: checkIns.data,
+      checkIns: checkIns,
       isLoading: false,
       checkinAvailable: !isCheckedIn
     });
@@ -89,37 +112,39 @@ class Scan extends Component {
 
   getCheckins = async (pageNumber = 1) => {
     let results = await TitoCheckInApi.getCheckins(this.props.accountSettings.checkinListSlug, pageNumber);
-    let nextPage = results.data.meta.next_page;
+    let nextPage = pageNumber + 1;
 
-    if(nextPage) {
+    if(nextPage < this.state.totalPages) {
       return results.data.concat(await this.getCheckins(nextPage));
     } else {
       return results.data
     }
   };
 
-  getTicketStatus = (checkins, ticketId) => {
-    return checkins.some(checkin => checkin.ticket_id === ticketId);
+  getPages = async () => {
+    let results = await TitoCheckInApi.getList(this.props.accountSettings.checkinListSlug);
+
+    this.setState({ totalPages: results.data.total_checkin_pages });
   };
 
-  checkin(modal) {
-    let ticketId = parseInt(this.state.ticket.release_id);
+  getTicketStatus = async (checkins, ticket_id) => {
+    return checkins.some(checkin => { console.log(checkin.ticket_id); return checkin.ticket_id === ticket_id }) ;
+  };
 
-    TitoCheckInApi.checkinTicket(
-      this.props.accountSettings.checkinListSlug,
-      ticketId
-    )
-      .then(() => {
-        modal.hideModal();
-        this.props.navigation.navigate("CheckInList");
-      })
-      .catch(error => {
-        console.log(error);
-        if (error.response && error.response.status === 404) {
-          this.setState({ error: "Ticket not found." });
-        }
-      });
-  }
+  checkin = async (modal) => {
+    let ticketId = parseInt(this.state.ticket.id);
+
+    try {
+      await TitoCheckInApi.checkinTicket(this.props.accountSettings.checkinListSlug, ticketId);
+
+      modal.hideModal();
+      this.props.navigation.navigate("Dashboard");
+    } catch (e) {
+      this.setState({ error: e.message });
+    } finally {
+      this.setState({ isLoading: false });
+    }
+  };
 
   render() {
     return (
@@ -164,7 +189,7 @@ class Scan extends Component {
                           style={{ marginRight: 20 }}
                         />
                       }
-                      onPress={() => this.checkin(this)}
+                      onPress={ async () => this.checkin(this)}
                       title="Check In"
                       titleStyle={{ fontSize: 25 }}
                       buttonStyle={{
@@ -179,10 +204,11 @@ class Scan extends Component {
                         textAlign: "center",
                         color: "#4caf50",
                         fontWeight: "bold",
-                        width: "100%"
+                        width: "100%",
+                        flexShrink: 1
                       }}
                     >
-                      Already Checked In{" "}
+                      {this.state.error ? this.state.error : "Already Checked In"}
                     </Text>
                   )}
                 </View>
@@ -246,7 +272,7 @@ const mapDispatchToProps = dispatch => ({
   getAccountSettings: () => dispatch(getAccountSettings())
 });
 
-export default connect(
+export default withNavigationFocus(connect(
   makeMapStateToProps,
   mapDispatchToProps
-)(Scan);
+)(Scan));

@@ -20,4 +20,10 @@ export default class TitoCheckInApi {
       }
     );
   }
+
+  static getTicket(checkinSlug, ticketSlug) {
+    return Api.get(
+      `${config.TITO_CHECKIN_API_URL}checkin_lists/${checkinSlug}/tickets/${ticketSlug}`
+    );
+  }
 }

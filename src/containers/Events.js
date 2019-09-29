@@ -1,5 +1,5 @@
 import React, { Component } from "react";
-import { StyleSheet, View, Text, ScrollView, Alert } from "react-native";
+import { StyleSheet, View, Text, ScrollView, Alert} from "react-native";
 import { ListItem } from "react-native-elements";
 import { connect } from "react-redux";
 import Constants from "expo-constants";
@@ -15,6 +15,10 @@ class Events extends Component {
   };
 
   componentDidMount = async () => {
+    await this.loadData();
+  };
+
+  loadData = async() => {
     await this.props.getAccountSettings();
     await this.props.getEventSlug();
 

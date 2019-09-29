@@ -8,6 +8,7 @@ import TitoCheckInApi from "../services/TitoCheckInApi";
 import Loader from "../components/Loader";
 import TitoAdminApi from "../services/TitoAdminApi";
 import {getEventSlug} from "../redux/actions/account";
+import { withNavigationFocus } from 'react-navigation';
 
 class CheckIns extends Component {
   state = {
@@ -18,10 +19,21 @@ class CheckIns extends Component {
   };
 
   componentDidMount = async () => {
+    await this.loadData();
+  };
+
+  componentDidUpdate = async (prevProps) => {
+    if (prevProps.isFocused !== this.props.isFocused) {
+      await this.loadData();
+    }
+  };
+
+  loadData = async () => {
     await this.props.getEventSlug();
     await this.getAllTickets();
     await this.getCheckIns();
   };
+
 
   getCheckIns = async () => {
     this.setState({ isLoading: true });
@@ -95,8 +107,8 @@ class CheckIns extends Component {
           (
           <ListItem
             key={checkin.id}
-            title={`${checkin.first_name} ${checkin.last_name}` }
-            subtitle={`${checkin.number}`}
+            title={CheckIns.itemTile(checkin) }
+            subtitle={CheckIns.itemSubtitle(checkin)}
             topDivider
             subtitleStyle={{ color: "#888888" }}
           />
@@ -104,6 +116,18 @@ class CheckIns extends Component {
       </ScrollView>
     );
   };
+
+  static itemTile(ticket) {
+    if(ticket.company_name) {
+      return `${ticket.first_name} ${ticket.last_name} (${ticket.company_name})`
+    }
+
+    return `${ticket.first_name} ${ticket.last_name}`
+  }
+
+  static itemSubtitle(ticket) {
+    return `${ticket.number} (${ticket.reference})`
+  }
 }
 
 
@@ -126,7 +150,7 @@ const mapDispatchToProps = dispatch => ({
   getEventSlug: () => dispatch(getEventSlug())
 });
 
-export default connect(
+export default withNavigationFocus(connect(
   mapStateToProps,
   mapDispatchToProps
-)(CheckIns);
+)(CheckIns));

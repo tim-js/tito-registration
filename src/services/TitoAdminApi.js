@@ -11,7 +11,7 @@ export default class TitoAdminApi {
   }
 
   static getTicketData(apiKey, teamSlug, eventSlug, ticketSlug) {
-    return Api.get(`${config.TITO_ADMIN_API_URL}/${teamSlug}/${eventSlug}/tickets/${ticketSlug}`, {}, { 'Authorization': `Token token=${apiKey}` });
+    return Api.get(`${config.TITO_ADMIN_API_URL}/${teamSlug}/${eventSlug}/tickets/${ticketSlug}`, {}, { Accept: 'application/json', Authorization: `Token token=${apiKey}` });
   }
 
   static getAllTickets(apiKey, teamSlug, eventSlug, pageNumber = 1) {

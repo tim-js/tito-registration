@@ -16,8 +16,11 @@ class CheckinList extends Component {
   };
 
   componentDidMount = async () => {
-    await this.props.getEventSlug();
+    await this.loadData();
+  };
 
+  loadData = async () => {
+    await this.props.getEventSlug();
     await this.getCheckinLists();
   };
 
@@ -28,8 +31,6 @@ class CheckinList extends Component {
         this.props.accountSettings.teamSlug,
         this.props.eventSlug
       );
-
-      console.log(response.data)
       this.setState({ checkInLists: response.data.checkin_lists});
     } catch (e) {
       this.setState({ error: e.message });

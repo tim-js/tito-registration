@@ -1,4 +1,4 @@
-import { SET_ACCOUNT_SETTINGS } from "../action-types";
+import {RELOAD_SCREEN, SET_ACCOUNT_SETTINGS} from "../action-types";
 import { CLEAR_ACCOUNT_SETTINGS } from "../action-types";
 import { GET_ACCOUNT_SETTINGS } from "../action-types";
 import { SET_EVENT_SLUG } from "../action-types";
@@ -46,7 +46,6 @@ export const setEventSlug = (eventSlug) => async (dispatch, getState) => {
 export const getEventSlug = () => async (dispatch, getState) => {
   const eventSlug = await Storage.getEventSlug();
 
-  console.log("getEventSlugActionL", eventSlug);
   dispatch({ type: SET_EVENT_SLUG, eventSlug: eventSlug });
 
   return eventSlug;

@@ -1,4 +1,4 @@
-import {GET_ACCOUNT_SETTINGS, SET_ACCOUNT_SETTINGS, CLEAR_ACCOUNT_SETTINGS, SET_EVENT_SLUG, GET_EVENT_SLUG} from '../action-types';
+import {SET_ACCOUNT_SETTINGS, CLEAR_ACCOUNT_SETTINGS, SET_EVENT_SLUG} from '../action-types';
 const initialState = { accountSettings: {} };
 
 export default function(state = initialState, action) {

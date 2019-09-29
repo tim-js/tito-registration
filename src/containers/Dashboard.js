@@ -1,11 +1,12 @@
 import React, {Component} from "react";
-import {StyleSheet, Text, TouchableOpacity, View, Alert} from "react-native";
+import {StyleSheet, Text, TouchableOpacity, View} from "react-native";
 import {Button} from "react-native-elements";
 
 import TitoCheckInApi from "../services/TitoCheckInApi";
-import {clearAccount, getAccountSettings} from "../redux/actions/account";
+import {clearAccount, getAccountSettings, getEventSlug} from "../redux/actions/account";
 import {connect} from "react-redux";
 import Loader from "../components/Loader";
+import { withNavigationFocus } from 'react-navigation';
 
 class Dashboard extends Component {
   state = {
@@ -15,10 +16,18 @@ class Dashboard extends Component {
   };
 
   componentDidMount = async () => {
+    await this.loadData();
+  };
+
+  componentDidUpdate = async (prevProps) => {
+    if (prevProps.isFocused !== this.props.isFocused) {
+      await this.loadData();
+    }
+  };
+
+  loadData = async () => {
+    await this.props.getEventSlug();
     await this.props.getAccountSettings();
-
-    console.log(this.props);
-
     await this.getCheckInList();
   };
 
@@ -193,10 +202,11 @@ const mapStateToProps = () => {
 
 const mapDispatchToProps = dispatch => ({
   signOut: () => dispatch(clearAccount()),
-  getAccountSettings: () => dispatch(getAccountSettings())
+  getAccountSettings: () => dispatch(getAccountSettings()),
+  getEventSlug: () => dispatch(getEventSlug())
 });
 
-export default connect(
+export default withNavigationFocus(connect(
   mapStateToProps,
   mapDispatchToProps
-)(Dashboard);
+)(Dashboard));
