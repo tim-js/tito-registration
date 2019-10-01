@@ -19,6 +19,12 @@ class CheckinList extends Component {
     await this.loadData();
   };
 
+  componentDidUpdate = async (prevProps) => {
+    if (prevProps.isFocused !== this.props.isFocused) {
+      await this.loadData();
+    }
+  };
+
   loadData = async () => {
     await this.props.getEventSlug();
     await this.getCheckinLists();

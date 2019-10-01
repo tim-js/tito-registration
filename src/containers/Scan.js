@@ -1,8 +1,7 @@
 import React, { Component } from "react";
-import { Text, View, StyleSheet, Modal, ActivityIndicator } from "react-native";
+import {Text, View, StyleSheet, Modal, ActivityIndicator, Alert} from "react-native";
 import { BarCodeScanner } from "expo-barcode-scanner";
 import * as Permissions from "expo-permissions";
-import Constants from "expo-constants";
 import TitoCheckInApi from "../services/TitoCheckInApi";
 import TitoAdminApi from "../services/TitoAdminApi";
 import Loader from "../components/Loader";
@@ -128,22 +127,36 @@ class Scan extends Component {
   };
 
   getTicketStatus = async (checkins, ticket_id) => {
-    return checkins.some(checkin => { console.log(checkin.ticket_id); return checkin.ticket_id === ticket_id }) ;
+    return checkins.some(checkin => { return checkin.ticket_id === ticket_id }) ;
   };
 
   checkin = async (modal) => {
     let ticketId = parseInt(this.state.ticket.id);
 
-    try {
-      await TitoCheckInApi.checkinTicket(this.props.accountSettings.checkinListSlug, ticketId);
+    Alert.alert(
+      'Check in',
+      'Are you sure you want to check this ticket?',
+      [
+        {
+          text: 'Cancel',
+          onPress: () => {},
+          style: 'cancel',
+        },
+        {
+          text: 'Yes', onPress: async () => {
+            try {
+              await TitoCheckInApi.checkinTicket(this.props.accountSettings.checkinListSlug, ticketId);
 
-      modal.hideModal();
-      this.props.navigation.navigate("Dashboard");
-    } catch (e) {
-      this.setState({ error: e.message });
-    } finally {
-      this.setState({ isLoading: false });
-    }
+              modal.hideModal();
+              this.props.navigation.navigate("Dashboard");
+            } catch (e) {
+              this.setState({ error: e.message });
+            } finally {
+              this.setState({ isLoading: false });
+            }
+          }
+        },
+      ]);
   };
 
   render() {

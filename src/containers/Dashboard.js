@@ -1,5 +1,5 @@
 import React, {Component} from "react";
-import {StyleSheet, Text, TouchableOpacity, View} from "react-native";
+import {StyleSheet, Text, TouchableOpacity, View, Alert} from "react-native";
 import {Button} from "react-native-elements";
 
 import TitoCheckInApi from "../services/TitoCheckInApi";
@@ -32,8 +32,22 @@ class Dashboard extends Component {
   };
 
   signOut = () => {
-    this.props.signOut();
-    this.props.navigation.navigate("SignIn");
+    Alert.alert(
+      'Sign Out?',
+      'This will remove the credentials.',
+      [
+        {
+          text: 'Cancel',
+          onPress: () => {},
+          style: 'cancel',
+        },
+        {
+          text: 'Sign Out', onPress: () => {
+            this.props.signOut();
+            this.props.navigation.navigate("SignIn");
+          }
+        },
+      ]);
   };
 
   getCheckInList = async() => {
@@ -104,7 +118,6 @@ class Dashboard extends Component {
           <Text style={styles.nrTickets}>{tickets_count}</Text>
           <Text style={styles.label}>Total Tickets</Text>
         </View>
-
         <View>
           <Button
             title="Scan Ticket"
