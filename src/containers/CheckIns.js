@@ -15,7 +15,10 @@ class CheckIns extends Component {
     isLoading: true,
     checkIns: [],
     tickets: [],
-    error: null
+    allTickets: [],
+    error: null,
+    total_checkin_pages: null,
+    totalPages: null
   };
 
   componentDidMount = async () => {
@@ -29,56 +32,64 @@ class CheckIns extends Component {
   };
 
   loadData = async () => {
-    await this.props.getEventSlug();
-    await this.getAllTickets();
-    await this.getCheckIns();
-  };
+    this.setState({ isLoading: true });
 
+    try {
+      await this.props.getEventSlug();
+      await this.getPages();
+      await this.getTickets();
+      await this.getCheckIns();
+    } catch (e) {
+      this.setState({ error: e.message });
+    } finally {
+      this.setState({ isLoading: false });
+    }
+  };
 
   getCheckIns = async () => {
-    this.setState({ isLoading: true });
-    try {
-      const response = await TitoCheckInApi.getCheckins(
-        this.props.accountSettings.checkinListSlug
-      );
-      let listWithUserData = await this.addUserDataToList(response.data);
+    const tickets = await this.getAllCheckins();
+    let listWithUserData = this.addUserDataToList(tickets);
 
-      this.setState({ checkIns: listWithUserData });
-    } catch (e) {
-      this.setState({ error: e.message });
-    } finally {
-      this.setState({ isLoading: false });
-    }
+    this.setState({ checkIns: listWithUserData });
   };
 
-  getAllTickets = async () => {
-    this.setState({ isLoading: true });
-    try {
-      let tickets = await this.getTickets();
-      this.setState({ allTickets: tickets });
-    } catch (e) {
-      this.setState({ error: e.message });
-    } finally {
-      this.setState({ isLoading: false });
-    }
+  getTickets = async () => {
+    let tickets = await this.getAllTickets();
+    this.setState({ allTickets: tickets });
   };
 
-  getTickets = async (pageNumber = 1) => {
+  getAllTickets = async (pageNumber = 1) => {
     let results = await TitoAdminApi.getAllTickets(this.props.accountSettings.apiKey, this.props.accountSettings.teamSlug, this.props.eventSlug, pageNumber);
     let nextPage = results.data.meta.next_page;
 
-    if(nextPage) {
-      return results.data.tickets.concat(await this.getTickets(nextPage));
+    if(nextPage !== null) {
+      return results.data.tickets.concat(await this.getAllTickets(nextPage));
     } else {
       return results.data.tickets
     }
   };
 
-  addUserDataToList = async list => {
+  getPages = async () => {
+    let results = await TitoCheckInApi.getList(this.props.accountSettings.checkinListSlug);
+
+    this.setState({ totalPages: results.data.total_checkin_pages });
+  };
+
+  getAllCheckins = async (pageNumber = 1) => {
+    let results = await TitoCheckInApi.getCheckins(this.props.accountSettings.checkinListSlug, pageNumber);
+    let nextPage = pageNumber + 1;
+
+    if(nextPage < this.state.totalPages) {
+      return results.data.concat(await this.getAllCheckins(nextPage));
+    } else {
+      return results.data
+    }
+  };
+
+  addUserDataToList = list => {
     let listIds = list.map(checkin => checkin.ticket_id);
     return this.state.allTickets.filter(ticket => listIds.includes(ticket.id));
   };
-
 
   render() {
     return (

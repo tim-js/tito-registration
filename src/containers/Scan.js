@@ -132,10 +132,11 @@ class Scan extends Component {
 
   checkin = async (modal) => {
     let ticketId = parseInt(this.state.ticket.id);
+    let ticketNumber = this.state.ticket.number;
 
     Alert.alert(
       'Check in',
-      'Are you sure you want to check this ticket?',
+      `Are you sure you want to check in the ticket: ${ticketNumber}?`,
       [
         {
           text: 'Cancel',
