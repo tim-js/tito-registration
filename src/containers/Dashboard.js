@@ -3,7 +3,7 @@ import {StyleSheet, Text, TouchableOpacity, View, Alert} from "react-native";
 import {Button} from "react-native-elements";
 
 import TitoCheckInApi from "../services/TitoCheckInApi";
-import {clearAccount, getAccountSettings, getEventSlug} from "../redux/actions/account";
+import {clearAccount, getAccountSettings} from "../redux/actions/account";
 import {connect} from "react-redux";
 import Loader from "../components/Loader";
 import { withNavigationFocus } from 'react-navigation';
@@ -26,7 +26,8 @@ class Dashboard extends Component {
   };
 
   loadData = async () => {
-    await this.props.getEventSlug();
+    this.setState({ isLoading: false });
+
     await this.props.getAccountSettings();
     await this.getCheckInList();
   };
@@ -216,7 +217,6 @@ const mapStateToProps = () => {
 const mapDispatchToProps = dispatch => ({
   signOut: () => dispatch(clearAccount()),
   getAccountSettings: () => dispatch(getAccountSettings()),
-  getEventSlug: () => dispatch(getEventSlug())
 });
 
 export default withNavigationFocus(connect(

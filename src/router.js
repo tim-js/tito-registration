@@ -7,7 +7,6 @@ import {
 import SignIn from "./containers/SignIn";
 import Dashboard from "./containers/Dashboard";
 import Scan from "./containers/Scan";
-import CheckIns from "./containers/CheckIns";
 import CheckinList from "./containers/CheckinList"
 import Events from "./containers/Events"
 import * as StatusBar from "react-native";
@@ -24,6 +23,20 @@ export const SignedOut = createStackNavigator({
     screen: SignIn,
     navigationOptions: {
       headerStyle
+    }
+  },
+  Events: {
+    screen: Events,
+    navigationOptions: {
+      headerStyle,
+      title: 'Choose the event',
+    }
+  },
+  CheckinList: {
+    screen: CheckinList,
+    navigationOptions: {
+      headerStyle,
+      title: 'Choose the checkin list',
     }
   }
 });
@@ -49,19 +62,6 @@ export const SignedIn = createBottomTabNavigator(
         tabBarIcon: ({ tintColor }) => (
           <Ionicons
             name="md-qr-scanner"
-            size={20}
-            color={tintColor}
-            style={{ marginTop: 6 }}
-          />
-        )
-      }
-    },
-    CheckIns: {
-      screen: CheckIns,
-      navigationOptions: {
-        tabBarIcon: ({ tintColor }) => (
-          <Ionicons
-            name="md-checkmark-circle-outline"
             size={20}
             color={tintColor}
             style={{ marginTop: 6 }}

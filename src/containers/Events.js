@@ -5,7 +5,7 @@ import { connect } from "react-redux";
 import Constants from "expo-constants";
 import TitoAdminApi from "../services/TitoAdminApi"
 import Loader from "../components/Loader";
-import {setEventSlug, getAccountSettings, getEventSlug} from "../redux/actions/account";
+import {setEventSlug, getAccountSettings } from "../redux/actions/account";
 
 class Events extends Component {
   state = {
@@ -20,7 +20,6 @@ class Events extends Component {
 
   loadData = async() => {
     await this.props.getAccountSettings();
-    await this.props.getEventSlug();
 
     await this.getEvents(this.props.accountSettings.apiKey, this.props.accountSettings.teamSlug);
   };
@@ -70,8 +69,8 @@ class Events extends Component {
             key={ `${event.slug}` }
             title={ `${event.title}` }
             subtitle={ `${event.description}` }
-            titleStyle={ event.slug === this.props.eventSlug ? { color: "#1046af" } : { color: "#888888" } }
-            subtitleStyle={ event.slug === this.props.eventSlug ? { color: "#4caf50" } : { color: "#888888" } }
+            titleStyle={ event.slug === this.props.accountSettings.eventSlug ? { color: "#1046af" } : { color: "#888888" } }
+            subtitleStyle={ event.slug === this.props.accountSettings.eventSlug ? { color: "#4caf50" } : { color: "#888888" } }
             onPress={ async () => await this.saveEvent(event.slug) }
             topDivider
           />
@@ -81,6 +80,7 @@ class Events extends Component {
   };
 
   saveEvent = async (eventSlug) => {
+    console.log(eventSlug);
     this.setState({ isLoading: true });
     try {
       await this.props.setEventSlug(eventSlug);
@@ -104,8 +104,7 @@ const styles = StyleSheet.create({
 const mapStateToProps = () => {
   return state => {
     return {
-      ...state.accountSettings,
-
+      ...state.accountSettings
     };
   };
 };
@@ -113,7 +112,6 @@ const mapStateToProps = () => {
 const mapDispatchToProps = dispatch => ({
   getAccountSettings: () => dispatch(getAccountSettings()),
   setEventSlug: eventSlug => dispatch(setEventSlug(eventSlug)),
-  getEventSlug: () => dispatch(getEventSlug())
 });
 
 export default connect(

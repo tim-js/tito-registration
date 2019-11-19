@@ -7,7 +7,7 @@ import Constants from "expo-constants";
 import TitoCheckInApi from "../services/TitoCheckInApi";
 import Loader from "../components/Loader";
 import TitoAdminApi from "../services/TitoAdminApi";
-import {getEventSlug} from "../redux/actions/account";
+import { getAccountSettings } from "../redux/actions/account";
 import { withNavigationFocus } from 'react-navigation';
 
 class CheckIns extends Component {
@@ -35,7 +35,7 @@ class CheckIns extends Component {
     this.setState({ isLoading: true });
 
     try {
-      await this.props.getEventSlug();
+      await this.props.getAccountSettings();
       await this.getPages();
       await this.getTickets();
       await this.getCheckIns();
@@ -59,7 +59,12 @@ class CheckIns extends Component {
   };
 
   getAllTickets = async (pageNumber = 1) => {
-    let results = await TitoAdminApi.getAllTickets(this.props.accountSettings.apiKey, this.props.accountSettings.teamSlug, this.props.eventSlug, pageNumber);
+    let results = await TitoAdminApi.getAllTickets(
+      this.props.accountSettings.apiKey,
+      this.props.accountSettings.teamSlug,
+      this.props.accountSettings.eventSlug, pageNumber
+    );
+
     let nextPage = results.data.meta.next_page;
 
     if(nextPage !== null) {
@@ -158,7 +163,7 @@ const mapStateToProps = () => {
 };
 
 const mapDispatchToProps = dispatch => ({
-  getEventSlug: () => dispatch(getEventSlug())
+  getAccountSettings: () => dispatch(getAccountSettings())
 });
 
 export default withNavigationFocus(connect(

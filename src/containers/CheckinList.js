@@ -6,7 +6,7 @@ import Constants from "expo-constants";
 
 import TitoAdminApi from "../services/TitoAdminApi";
 import Loader from "../components/Loader";
-import {getEventSlug, setCheckinListSlug} from "../redux/actions/account";
+import { getAccountSettings, setCheckinListSlug } from "../redux/actions/account";
 
 class CheckinList extends Component {
   state = {
@@ -26,7 +26,7 @@ class CheckinList extends Component {
   };
 
   loadData = async () => {
-    await this.props.getEventSlug();
+    await this.props.getAccountSettings();
     await this.getCheckinLists();
   };
 
@@ -35,7 +35,7 @@ class CheckinList extends Component {
       const response = await TitoAdminApi.getCheckinLists(
         this.props.accountSettings.apiKey,
         this.props.accountSettings.teamSlug,
-        this.props.eventSlug
+        this.props.accountSettings.eventSlug
       );
       this.setState({ checkInLists: response.data.checkin_lists});
     } catch (e) {
@@ -114,7 +114,7 @@ const mapStateToProps = () => {
 
 const mapDispatchToProps = dispatch => ({
   setCheckinListSlug: slug => dispatch(setCheckinListSlug(slug)),
-  getEventSlug: () => dispatch(getEventSlug())
+  getAccountSettings: () => dispatch(getAccountSettings())
 });
 
 export default connect(
