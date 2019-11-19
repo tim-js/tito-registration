@@ -74,7 +74,7 @@ export const SignedIn = createBottomTabNavigator(
       navigationOptions: {
         tabBarIcon: ({ tintColor }) => (
           <Ionicons
-            name="md-checkmark-circle-outline"
+            name="md-list"
             size={20}
             color={tintColor}
             style={{ marginTop: 6 }}
@@ -87,7 +87,7 @@ export const SignedIn = createBottomTabNavigator(
       navigationOptions: {
         tabBarIcon: ({ tintColor }) => (
           <Ionicons
-            name="md-checkmark-circle-outline"
+            name="md-list-box"
             size={20}
             color={tintColor}
             style={{ marginTop: 6 }}

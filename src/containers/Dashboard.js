@@ -26,7 +26,7 @@ class Dashboard extends Component {
   };
 
   loadData = async () => {
-    this.setState({ isLoading: false });
+    this.setState({ isLoading: true });
 
     await this.props.getAccountSettings();
     await this.getCheckInList();
@@ -86,7 +86,7 @@ class Dashboard extends Component {
       tickets_count > 0 ? (checkins_count * 100) / tickets_count : 0;
 
     if (isLoading) {
-      return <Loader text="Fetching CheckIn List" />;
+      return <Loader text="Fetching CheckIn List Info" />;
     }
 
     if (error) {

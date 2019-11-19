@@ -38,7 +38,10 @@ class Scan extends Component {
     this.setState({
       modalVisible: false,
       scanResult: "",
-      ticket: null
+      ticket: null,
+      checkinAvailable: null,
+      error: null,
+      isLoading: false
     });
   }
 
@@ -54,8 +57,12 @@ class Scan extends Component {
   };
 
   loadData = async () => {
+    this.setState({ isLoading: true });
+
     await this.props.getAccountSettings();
     await this.getPages();
+
+    this.setState({ isLoading: false });
   };
 
   _requestCameraPermission = async () => {
@@ -69,7 +76,7 @@ class Scan extends Component {
     this.setState({ isLoading: true });
     this.showModal();
 
-    if (this.state.scanResult) {
+    if (this.state.scanResult && this.state.ticket) {
       this.setState({ isLoading: false });
       return;
     }
@@ -82,7 +89,7 @@ class Scan extends Component {
     const ticketData = await TitoAdminApi.getTicketData(
       this.props.accountSettings.apiKey,
       this.props.accountSettings.teamSlug,
-      this.props.eventSlug,
+      this.props.accountSettings.eventSlug,
       slug
     );
 
@@ -96,7 +103,6 @@ class Scan extends Component {
       this.setState({error: null});
     } catch(e) {
       alert("The ticket is not from this checkin list");
-      // this.setState({error: `Ticket: ${ticket.first_name} ${ticket.last_name} - ${ticket.number} is not available for checkin`});
       this.setState({error: `Not found in this checkin list`});
       ticket = null;
     }
@@ -190,27 +196,43 @@ class Scan extends Component {
               <Loader />
             ) : (
               <>
-                {Scan._renderTicket(this.state.ticket)}
+
+                { Scan._renderTicket(this.state.ticket) }
 
                 <View style={{ marginBottom: 20 }}>
-                  {this.state.ticket && this.state.checkinAvailable ? (
-                    <Button
-                      icon={
-                        <Ionicons
-                          name="md-checkmark-circle-outline"
-                          size={25}
-                          color="#ffffff"
-                          style={{ marginRight: 20 }}
-                        />
-                      }
-                      onPress={ async () => this.checkin(this)}
-                      title="Check In"
-                      titleStyle={{ fontSize: 25 }}
-                      buttonStyle={{
-                        backgroundColor: "#4caf50",
-                        paddingHorizontal: 20
-                      }}
-                    />
+                  {this.state.ticket ? (
+                    this.state.checkinAvailable ? (
+                      <Button
+                        icon={
+                          <Ionicons
+                            name="md-checkmark-circle-outline"
+                            size={25}
+                            color="#ffffff"
+                            style={{ marginRight: 20 }}
+                          />
+                        }
+                        onPress={ async () => this.checkin(this)}
+                        title="Check In"
+                        titleStyle={{ fontSize: 25 }}
+                        buttonStyle={{
+                          backgroundColor: "#4caf50",
+                          paddingHorizontal: 20
+                        }}
+                      />
+                    ) : (
+                      <Text
+                        style={{
+                          fontSize: 30,
+                          textAlign: "center",
+                          color: "#4caf50",
+                          fontWeight: "bold",
+                          width: "100%",
+                          flexShrink: 1
+                        }}
+                      >
+                        {this.state.error ? this.state.error : "Already Checked In"}
+                      </Text>
+                    )
                   ) : (
                     <Text
                       style={{
@@ -222,7 +244,7 @@ class Scan extends Component {
                         flexShrink: 1
                       }}
                     >
-                      {this.state.error ? this.state.error : "Already Checked In"}
+                      { this.state.error ? this.state.error : 'No ticket data' }
                     </Text>
                   )}
                 </View>
@@ -243,8 +265,8 @@ class Scan extends Component {
   }
 
   static _renderTicket(ticket) {
-    if (!ticket) {
-      return <Text>No ticket data</Text>;
+    if(!ticket){
+      return;
     }
 
     const { first_name, last_name, number, reference } = ticket;
@@ -277,7 +299,6 @@ const makeMapStateToProps = () => {
   return state => {
     return {
       ...state.accountSettings,
-      eventSlug: state.accountSettings.eventSlug
     };
   };
 };
