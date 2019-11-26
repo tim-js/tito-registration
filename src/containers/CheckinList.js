@@ -26,6 +26,8 @@ class CheckinList extends Component {
   };
 
   loadData = async () => {
+    this.setState({ isLoading: true });
+
     await this.props.getAccountSettings();
     await this.getCheckinLists();
   };
@@ -90,7 +92,6 @@ class CheckinList extends Component {
       await this.props.setCheckinListSlug(checkinListSlug);
       this.props.navigation.navigate("Dashboard");
     } catch (e) {
-      console.log('error', e);
       this.setState({ error: e.message });
       Alert.alert("Something went wrong, please try again.");
     } finally {
@@ -108,7 +109,6 @@ const styles = StyleSheet.create({
 const mapStateToProps = () => {
   return state => ({
     ...state.accountSettings,
-    eventSlug: state.accountSettings.eventSlug
   });
 };
 

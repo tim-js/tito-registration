@@ -1,6 +1,6 @@
 {
   "name": "tito-checkin",
-  "version": "0.0.0",
+  "version": "0.0.1",
   "description": "Improved checkin app for ti.to events, based on the order number, which is an auto-increment.",
   "author": null,
   "private": true,

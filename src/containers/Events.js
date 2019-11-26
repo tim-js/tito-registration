@@ -18,6 +18,12 @@ class Events extends Component {
     await this.loadData();
   };
 
+  componentDidUpdate = async (prevProps) => {
+    if (prevProps.isFocused !== this.props.isFocused) {
+      await this.loadData();
+    }
+  };
+
   loadData = async() => {
     await this.props.getAccountSettings();
 
@@ -33,7 +39,6 @@ class Events extends Component {
         this.setState({ isLoading: false });
       }
     } catch (e) {
-      console.log('error', e);
       this.setState({ error: e.message });
       Alert.alert("Invalid Credentials");
     } finally {
@@ -80,13 +85,11 @@ class Events extends Component {
   };
 
   saveEvent = async (eventSlug) => {
-    console.log(eventSlug);
     this.setState({ isLoading: true });
     try {
       await this.props.setEventSlug(eventSlug);
       this.props.navigation.navigate("CheckinList");
     } catch (e) {
-      console.log('error', e);
       this.setState({ error: e.message });
       Alert.alert("Something went wrong, please try again.");
     } finally {
