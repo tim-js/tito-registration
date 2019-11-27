@@ -22,3 +22,7 @@ To run the app there follow the instructions from [expo-cli](https://docs.expo.i
 
 Cheat Sheet:
 To start the expo CLI from bash, run:  **expo start**
+To create a build, run: **expo build:android/ios**
+
+For iOS, validate the build with: **xcrun altool --validate-app -f build_name.ipa -t ios -u [email] -p [password]**
+To upload the build on testflight **xcrun altool --upload-app -f build_name.ipa -t ios -u [email] -p [password]**
