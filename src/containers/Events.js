@@ -73,7 +73,7 @@ class Events extends Component {
           <ListItem
             key={ `${event.slug}` }
             title={ `${event.title}` }
-            subtitle={ `${event.description}` }
+            subtitle={ `${event.description || 'Description unavailable'}` }
             titleStyle={ event.slug === this.props.accountSettings.eventSlug ? { color: "#1046af" } : { color: "#888888" } }
             subtitleStyle={ event.slug === this.props.accountSettings.eventSlug ? { color: "#4caf50" } : { color: "#888888" } }
             onPress={ async () => await this.saveEvent(event.slug) }

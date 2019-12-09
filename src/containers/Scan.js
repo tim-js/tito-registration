@@ -1,5 +1,5 @@
 import React, { Component } from "react";
-import {Text, View, StyleSheet, Modal, ActivityIndicator, Alert} from "react-native";
+import {Text, View, StyleSheet, Modal, Alert} from "react-native";
 import { BarCodeScanner } from "expo-barcode-scanner";
 import * as Permissions from "expo-permissions";
 import TitoCheckInApi from "../services/TitoCheckInApi";
@@ -11,6 +11,7 @@ import { Button } from "react-native-elements";
 import { getAccountSettings } from "../redux/actions/account";
 import { connect } from "react-redux";
 import {withNavigationFocus} from "react-navigation";
+import isEmpty from "react-native-web/dist/vendor/react-native/isEmpty";
 
 class Scan extends Component {
   state = {
@@ -23,7 +24,8 @@ class Scan extends Component {
     checkinAvailable: null,
     isLoading: false,
     totalPages: 1,
-    error: null
+    error: null,
+    scanned: false
   };
 
   static navigationOptions = {
@@ -41,7 +43,8 @@ class Scan extends Component {
       ticket: null,
       checkinAvailable: null,
       error: null,
-      isLoading: false
+      isLoading: false,
+      scanned: false
     });
   }
 
@@ -73,25 +76,37 @@ class Scan extends Component {
   };
 
   _handleBarCodeRead = async qrData => {
+    this.setState({ scanned: true} );
     this.setState({ isLoading: true });
     this.showModal();
-
-    if (this.state.scanResult && this.state.ticket) {
-      this.setState({ isLoading: false });
-      return;
-    }
 
     this.setState({ scanResult: qrData });
 
     const splicedURI = qrData.data.split("/");
     const slug = splicedURI[splicedURI.length - 1];
+    let ticketData;
 
-    const ticketData = await TitoAdminApi.getTicketData(
-      this.props.accountSettings.apiKey,
-      this.props.accountSettings.teamSlug,
-      this.props.accountSettings.eventSlug,
-      slug
-    );
+    try{
+      ticketData = await TitoAdminApi.getTicketData(
+        this.props.accountSettings.apiKey,
+        this.props.accountSettings.teamSlug,
+        this.props.accountSettings.eventSlug,
+        slug
+      );
+    } catch(e) {
+      alert("The ticket was not found for this event");
+      this.setState({error: `Ticket not found`});
+      ticket = null;
+
+      this.setState({
+        ticket,
+        checkIns: [],
+        isLoading: false,
+        checkinAvailable: null,
+      });
+
+      return;
+    }
 
     const checkIns = await this.getCheckins();
     let ticket = ticketData.data.ticket;
@@ -177,7 +192,7 @@ class Scan extends Component {
           <BarCodeScanner
             barCodeTypes={[BarCodeScanner.Constants.BarCodeType.qr]}
             style={StyleSheet.absoluteFillObject}
-            onBarCodeScanned={this._handleBarCodeRead}
+            onBarCodeScanned={ this.state.scanned ? null : this._handleBarCodeRead }
           />
         )}
 
@@ -258,6 +273,12 @@ class Scan extends Component {
                 />
               </>
             )}
+
+            <Button
+              onPress={() => this.hideModal()}
+              title="Go back"
+            >
+            </Button>
           </View>
         </Modal>
       </View>
