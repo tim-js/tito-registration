@@ -4,7 +4,7 @@
     "description": "Improved checkin app for ti.to events, based on the order number, which is an auto-increment.",
     "slug": "snack-SkajC7DxB",
     "privacy": "unlisted",
-    "sdkVersion": "33.0.0",
+    "sdkVersion": "34.0.0",
     "version": "1.0.3",
     "orientation": "portrait",
     "primaryColor": "#cccccc",
