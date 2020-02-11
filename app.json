@@ -33,6 +33,9 @@
     "platforms": [
       "android",
       "ios"
-    ]
-  }
+    ],
+    "entryPoint": "node_modules/expo/AppEntry.js"
+  },
+  "displayName": "tito-checkin",
+  "name": "titocheckin"
 }

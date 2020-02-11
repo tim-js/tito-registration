@@ -1,9 +1,8 @@
 import React from "react";
-import {
-  createSwitchNavigator,
-  createStackNavigator,
-  createBottomTabNavigator
-} from "react-navigation";
+import { createSwitchNavigator } from "react-navigation";
+import { createStackNavigator } from 'react-navigation-stack';
+import { createBottomTabNavigator } from 'react-navigation-tabs';
+
 import SignIn from "./containers/SignIn";
 import Dashboard from "./containers/Dashboard";
 import Scan from "./containers/Scan";
