@@ -1,58 +1,64 @@
 import { AsyncStorage } from "react-native";
-import {EVENT_SLUG, CHECKIN_LIST_SLUG, API_KEY, TEAM_SLUG} from "../constants";
+import {
+  EVENT_SLUG,
+  CHECKIN_LIST_SLUG,
+  API_KEY,
+  TEAM_SLUG
+} from "../constants";
 
 export default class Storage {
-  static setAccountSettings = async (accountSettings) => {
-    if(accountSettings.checkinListSlug) {
-      await Storage.setStorageInfo(CHECKIN_LIST_SLUG, accountSettings.checkinListSlug);
+  static setAccountSettings = async accountSettings => {
+    const { checkinListSlug, apiKey, teamSlug, eventSlug } = accountSettings;
+    if (checkinListSlug) {
+      await Storage.setStorageInfo(CHECKIN_LIST_SLUG, checkinListSlug);
     }
-    if(accountSettings.apiKey) {
-      await Storage.setStorageInfo(API_KEY, accountSettings.apiKey);
+    if (apiKey) {
+      await Storage.setStorageInfo(API_KEY, apiKey);
     }
-    if(accountSettings.apiKey) {
-      await Storage.setStorageInfo(TEAM_SLUG, accountSettings.teamSlug);
+    if (apiKey) {
+      await Storage.setStorageInfo(TEAM_SLUG, teamSlug);
     }
-    if(accountSettings.eventSlug) {
-      await Storage.setStorageInfo(EVENT_SLUG, accountSettings.eventSlug);
+    if (eventSlug) {
+      await Storage.setStorageInfo(EVENT_SLUG, eventSlug);
     }
   };
 
-  static getAccountSettings = async () => {
+  static async getAccountSettings() {
     return {
       checkinListSlug: await Storage.getStorageInfo(CHECKIN_LIST_SLUG),
-      apiKey:          await Storage.getStorageInfo(API_KEY),
-      teamSlug:        await Storage.getStorageInfo(TEAM_SLUG),
-      eventSlug:       await Storage.getStorageInfo(EVENT_SLUG)
-    }
-  };
-
-  static clearAccountSettings() {
-    Storage.clearInfo(CHECKIN_LIST_SLUG);
-    Storage.clearInfo(API_KEY);
-    Storage.clearInfo(TEAM_SLUG);
-    Storage.clearInfo(EVENT_SLUG);
+      apiKey: await Storage.getStorageInfo(API_KEY),
+      teamSlug: await Storage.getStorageInfo(TEAM_SLUG),
+      eventSlug: await Storage.getStorageInfo(EVENT_SLUG)
+    };
   }
 
-  static getStorageInfo = async (key) => {
+  static async clearAccountSettings() {
+    await Storage.clearInfo(CHECKIN_LIST_SLUG);
+    await Storage.clearInfo(API_KEY);
+    await Storage.clearInfo(TEAM_SLUG);
+    await Storage.clearInfo(EVENT_SLUG);
+  }
+
+  static async getStorageInfo(key) {
     try {
-      return await AsyncStorage.getItem(key, () => {});
+      return AsyncStorage.getItem(key, () => {});
     } catch (error) {
       console.error(error);
       return null;
     }
-  };
+  }
 
-  static setStorageInfo(key, info) {
+  static async setStorageInfo(key, info) {
     try {
-      AsyncStorage.setItem(key, info, () => {});
+      return AsyncStorage.setItem(key, info, () => {});
     } catch (error) {
       console.error(error);
     }
   }
 
-  static clearInfo(key) {
+  static async clearInfo(key) {
     try {
-      AsyncStorage.removeItem(key, () => {});
+      return AsyncStorage.removeItem(key, () => {});
     } catch (error) {
       console.error(error);
     }
