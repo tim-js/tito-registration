@@ -3,10 +3,18 @@ import {EVENT_SLUG, CHECKIN_LIST_SLUG, API_KEY, TEAM_SLUG} from "../constants";
 
 export default class Storage {
   static setAccountSettings = async (accountSettings) => {
-    await Storage.setStorageInfo(CHECKIN_LIST_SLUG, accountSettings.checkinListSlug);
-    await Storage.setStorageInfo(API_KEY, accountSettings.apiKey);
-    await Storage.setStorageInfo(TEAM_SLUG, accountSettings.teamSlug);
-    await Storage.setStorageInfo(EVENT_SLUG, accountSettings.eventSlug);
+    if(accountSettings.checkinListSlug) {
+      await Storage.setStorageInfo(CHECKIN_LIST_SLUG, accountSettings.checkinListSlug);
+    }
+    if(accountSettings.apiKey) {
+      await Storage.setStorageInfo(API_KEY, accountSettings.apiKey);
+    }
+    if(accountSettings.apiKey) {
+      await Storage.setStorageInfo(TEAM_SLUG, accountSettings.teamSlug);
+    }
+    if(accountSettings.eventSlug) {
+      await Storage.setStorageInfo(EVENT_SLUG, accountSettings.eventSlug);
+    }
   };
 
   static getAccountSettings = async () => {

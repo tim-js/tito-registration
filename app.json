@@ -24,7 +24,7 @@
     "ios": {
       "supportsTablet": true,
       "bundleIdentifier": "com.revojs.registration",
-      "buildNumber": "3"
+      "buildNumber": "4"
     },
     "android": {
       "package": "com.revojs.registration",
