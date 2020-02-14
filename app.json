@@ -24,7 +24,10 @@
     "ios": {
       "supportsTablet": true,
       "bundleIdentifier": "com.revojs.registration",
-      "buildNumber": "4"
+      "buildNumber": "6",
+      "infoPlist": {
+        "NSCameraUsageDescription": "This app uses the camera to scan the attendee QR code from the event tickets."
+      }
     },
     "android": {
       "package": "com.revojs.registration",
