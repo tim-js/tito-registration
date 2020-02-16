@@ -7,8 +7,8 @@ This application uses 2 ti.to APIs:
 
 To be able to authenticate you with ti.to, we need your:
 
-* Api Key;
-* Team Slug;
+* **Api Key**;
+* **Team Slug**;
 
 ## What do we do with your data?
 
