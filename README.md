@@ -1,28 +1,39 @@
-# Tito-CHECKIN
+# tito Registration App
 
- Improved checkin app for ti.to events, based on the order number, which is an auto-increment.
+ Improved checkin app for [ti.to](https://ti.to/) events, based on the order number, which is an auto-increment.
+ 
+ Built with React Native, using Expo.
 
-# App created using expo
+## Development
 
-Welcome to Expo!
+To run the app there follow the instructions from [expo-cli](https://docs.expo.io/versions/latest/get-started/installation/).
 
-Open the `App.js` file to start writing some code. You can preview the changes directly on your phone or tablet by clicking the **Run** button or use the simulator by clicking **Tap to Play**. When you're done, click **Save** and share the link!
+Then run:
+```
+expo start
+```
 
-When you're ready to see everything that Expo provides (or if you want to use your own editor) you can **Export** your project and use it with [expo-cli](https://docs.expo.io/versions/latest/introduction/installation.html).
+## Release
 
-Projects created in Snack are publicly available, so you can easily share the link to this project via link, or embed it on a web page with the **Embed** button.
+To create a build, run:
 
-If you're having problems, you can tweet to us [@expo](https://twitter.com/expo) or ask in our [forums](https://forums.expo.io).
+```
+expo build:ios
+expo build:android
+```
 
-Snack is Open Source. You can find the code on the [GitHub repo](https://github.com/expo/snack-web).
+For iOS, validate the build:
+```
+xcrun altool --validate-app -f [build_name.ipa] -t ios -u [email] -p [password]
+```
+To upload the build on TestFlight:
+```
+xcrun altool --upload-app -f [build_name.ipa] -t ios -u [email] -p [password]
+```
 
-# Development notes
+## Privacy Policy
 
-To run the app there follow the instructions from [expo-cli](https://docs.expo.io/versions/latest/introduction/installation.html)
+To use this app, we need an **Api Key** from ti.to and your **Team Slug**.
+This data is stored ONLY on your device. We don't save it on our servers or any other 3rd party service.
 
-Cheat Sheet:
-To start the expo CLI from bash, run:  **expo start**
-To create a build, run: **expo build:android/ios**
-
-For iOS, validate the build with: **xcrun altool --validate-app -f build_name.ipa -t ios -u [email] -p [password]**
-To upload the build on testflight **xcrun altool --upload-app -f build_name.ipa -t ios -u [email] -p [password]**
+Read more about our [Privacy Policy](./privacy-policy.md).
