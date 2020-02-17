@@ -7,6 +7,10 @@
  
  Built with React Native, using Expo.
 
+## Usage
+
+Cheackout our in-depth article on how to use this app and how to get a [Queueless Registration](https://revojs.ro/blog/queueless-registration).
+
 ## Development
 
 To run the app there follow the instructions from [expo-cli](https://docs.expo.io/versions/latest/get-started/installation/).
