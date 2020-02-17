@@ -2,6 +2,9 @@
 
  Improved checkin app for [ti.to](https://ti.to/) events, based on the order number, which is an auto-increment.
  
+- Google Play: https://play.google.com/store/apps/details?id=com.revojs.registration
+- App Store: https://apps.apple.com/us/app/ti-to-registration/id1483743059
+ 
  Built with React Native, using Expo.
 
 ## Development
