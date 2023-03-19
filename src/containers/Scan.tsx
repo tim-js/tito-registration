@@ -247,6 +247,8 @@ export default function Scan() {
               );
 
               hideModal();
+              setError(null);
+
               navigation.navigate('Main', { screen: 'Dashboard' });
             } catch (e) {
               setError(e.message);

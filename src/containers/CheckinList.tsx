@@ -22,6 +22,10 @@ export default function CheckinList() {
   useEffect(() => {
     setIsLoading(true);
 
+    if (!settings.apiKey) {
+      return;
+    }
+
     TitoAdminApi.getCheckinLists(
       settings.apiKey,
       settings.teamSlug,
@@ -30,6 +34,7 @@ export default function CheckinList() {
       .then((response) => {
         if (response.status === 200) {
           setCheckInLists(response.data.checkin_lists);
+          setError(null);
         }
       })
       .catch((e) => {
@@ -94,6 +99,8 @@ export default function CheckinList() {
     setIsLoading(true);
     try {
       await setSettings({ ...settings, checkinListSlug });
+      setError(null);
+
       navigation.navigate('Main', { screen: 'Dashboard' });
     } catch (e) {
       setError(e.message);

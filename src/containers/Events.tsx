@@ -20,10 +20,15 @@ export default function Events() {
     useNavigation<NativeStackNavigationProp<RootStackParams, 'Main'>>();
 
   useEffect(() => {
+    if (!settings.apiKey) {
+      return;
+    }
+
     TitoAdminApi.getEvents(settings.apiKey, settings.teamSlug)
       .then((response) => {
         if (response.status === 200) {
           setEvents(response.data.events);
+          setError(null);
         }
       })
       .catch((e) => {
@@ -90,6 +95,8 @@ export default function Events() {
 
     try {
       await setSettings({ ...settings, eventSlug });
+      setError(null);
+
       navigation.navigate('Main', { screen: 'CheckinList' });
     } catch (e) {
       setError(e.message);

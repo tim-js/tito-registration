@@ -24,10 +24,18 @@ export default function Dashboard() {
   const { settings, clearSettings } = useAccountSettings();
 
   useEffect(() => {
+    if (!settings.checkinListSlug) {
+      setError(
+        'No CheckIn List selected. Go to the Checkin List and select one.',
+      );
+      return;
+    }
+
     TitoCheckInApi.getList(settings.checkinListSlug)
       .then((response) => {
         if (response.status === 200) {
           setCheckInList(response.data);
+          setError(null);
         }
       })
       .catch((e) => {
@@ -107,7 +115,7 @@ export default function Dashboard() {
           containerStyle={{ marginTop: 20 }}
           type="clear"
           title="Sign Out"
-          onPress={() => this.signOut()}
+          onPress={() => signOut()}
         />
       </View>
     );
@@ -120,6 +128,11 @@ export default function Dashboard() {
       ) : null;
 
     return <View style={styles.progressOuter}>{inner}</View>;
+  }
+
+  function signOut() {
+    clearSettings();
+    navigation.navigate('SignIn');
   }
 }
 
