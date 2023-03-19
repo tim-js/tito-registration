@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useEffect } from 'react';
 import {
   createNativeStackNavigator,
   NativeStackNavigationOptions,
@@ -8,6 +8,7 @@ import { useNavigation } from '@react-navigation/native';
 import { isSignedIn } from '../auth';
 import SignIn from '../containers/SignIn';
 import BottomTabsNavigation from './BottomTabsNavigation';
+import useAccountSettings from '../hooks/useAccountSettings';
 
 export type RootStackParams = {
   SignIn: undefined;
@@ -25,13 +26,18 @@ const screenOptions: NativeStackNavigationOptions = {
 function RootStackNavigator() {
   const navigation =
     useNavigation<NativeStackNavigationProp<RootStackParams, 'Main'>>();
+  const { getSettings } = useAccountSettings();
 
   useEffect(() => {
-    isSignedIn().then((res) => {
-      if (res) {
+    isSignedIn()
+      .then((res) => {
+        if (res) {
+          return getSettings();
+        }
+      })
+      .then(() => {
         navigation.navigate('Main', { screen: 'Dashboard' });
-      }
-    });
+      });
   }, []);
 
   return (

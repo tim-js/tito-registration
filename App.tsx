@@ -1,9 +1,7 @@
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
 import { NavigationContainer } from '@react-navigation/native';
 import { ThemeProvider } from 'react-native-elements';
-import { isSignedIn } from './src/auth';
 import MainStackNavigation from './src/routers/MainStackNavigation';
-import BottomTabsNavigation from './src/routers/BottomTabsNavigation';
 import accountSettingsContext, {
   AccountSettings,
 } from './src/contexts/accountSettingsContext';

@@ -14,7 +14,7 @@ export default function CheckinList() {
   const [error, setError] = useState(null);
   const [checkInLists, setCheckInLists] = useState([]);
 
-  const { settings, setSettings, getSettings } = useAccountSettings();
+  const { settings, setSettings } = useAccountSettings();
 
   const navigation =
     useNavigation<NativeStackNavigationProp<RootStackParams, 'Main'>>();
@@ -22,14 +22,11 @@ export default function CheckinList() {
   useEffect(() => {
     setIsLoading(true);
 
-    getSettings()
-      .then((settings) => {
-        return TitoAdminApi.getCheckinLists(
-          settings.apiKey,
-          settings.teamSlug,
-          settings.eventSlug,
-        );
-      })
+    TitoAdminApi.getCheckinLists(
+      settings.apiKey,
+      settings.teamSlug,
+      settings.eventSlug,
+    )
       .then((response) => {
         if (response.status === 200) {
           setCheckInLists(response.data.checkin_lists);
@@ -41,7 +38,7 @@ export default function CheckinList() {
       .finally(() => {
         setIsLoading(false);
       });
-  }, []);
+  }, [settings.apiKey, settings.eventSlug, settings.teamSlug]);
 
   return (
     <View style={{ flex: 1, alignItems: 'center', justifyContent: 'center' }}>

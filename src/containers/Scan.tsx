@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import { useNavigation } from '@react-navigation/native';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { AccountSettings } from '../contexts/accountSettingsContext';
@@ -26,12 +26,18 @@ export default function Scan() {
 
   const [permission, requestPermission] = Camera.useCameraPermissions();
 
+  const { settings } = useAccountSettings();
+
+  const loadData = useCallback(async () => {
+    setIsLoading(true);
+    await getPages(settings);
+    setIsLoading(false);
+  }, [settings]);
+
   useEffect(() => {
     loadData();
     requestPermission();
-  }, []);
-
-  const { settings, getSettings } = useAccountSettings();
+  }, [loadData, requestPermission]);
 
   const navigation =
     useNavigation<NativeStackNavigationProp<RootStackParams, 'Main'>>();
@@ -129,13 +135,6 @@ export default function Scan() {
     </View>
   );
 
-  async function loadData() {
-    setIsLoading(true);
-    const settings = await getSettings();
-    await getPages(settings);
-    setIsLoading(false);
-  }
-
   async function getPages(settings: AccountSettings) {
     const results = await TitoCheckInApi.getList(settings.checkinListSlug);
     setTotalPages(results.data.total_checkin_pages);
@@ -192,11 +191,11 @@ export default function Scan() {
   }
 
   async function getCheckins(pageNumber = 1) {
-    let results = await TitoCheckInApi.getCheckins(
+    const results = await TitoCheckInApi.getCheckins(
       settings.checkinListSlug,
       pageNumber,
     );
-    let nextPage = pageNumber + 1;
+    const nextPage = pageNumber + 1;
 
     if (nextPage < totalPages) {
       return results.data.concat(await getCheckins(nextPage));
@@ -226,8 +225,8 @@ export default function Scan() {
   }
 
   async function checkin() {
-    let ticketId = parseInt(ticket.id);
-    let ticketNumber = ticket.number;
+    const ticketId = parseInt(ticket.id);
+    const ticketNumber = ticket.number;
 
     Alert.alert(
       'Check in',

@@ -21,13 +21,10 @@ export default function Dashboard() {
   const navigation =
     useNavigation<NativeStackNavigationProp<RootStackParams, 'Main'>>();
 
-  const { settings, getSettings, clearSettings } = useAccountSettings();
+  const { settings, clearSettings } = useAccountSettings();
 
   useEffect(() => {
-    getSettings()
-      .then((settings) => {
-        return TitoCheckInApi.getList(settings.checkinListSlug);
-      })
+    TitoCheckInApi.getList(settings.checkinListSlug)
       .then((response) => {
         if (response.status === 200) {
           setCheckInList(response.data);
@@ -39,7 +36,7 @@ export default function Dashboard() {
       .finally(() => {
         setIsLoading(false);
       });
-  }, []);
+  }, [settings]);
 
   const { title, slug, checkins_count, tickets_count } = checkInList;
 
@@ -101,8 +98,10 @@ export default function Dashboard() {
   function renderError(error) {
     return (
       <View>
-        <Text style={styles.title}>Couldn't get Checkin List</Text>
-        <Text style={styles.subtitle}>"{settings.checkinListSlug}"</Text>
+        <Text style={styles.title}>Couldn&apos;t get Checkin List</Text>
+        <Text style={styles.subtitle}>
+          &quot;{settings.checkinListSlug}&quot;
+        </Text>
         <Text>{error}</Text>
         <Button
           containerStyle={{ marginTop: 20 }}

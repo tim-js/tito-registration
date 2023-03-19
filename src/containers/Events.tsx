@@ -14,16 +14,13 @@ export default function Events() {
   const [error, setError] = useState(null);
   const [events, setEvents] = useState([]);
 
-  const { settings, setSettings, getSettings } = useAccountSettings();
+  const { settings, setSettings } = useAccountSettings();
 
   const navigation =
     useNavigation<NativeStackNavigationProp<RootStackParams, 'Main'>>();
 
   useEffect(() => {
-    getSettings()
-      .then((settings) => {
-        return TitoAdminApi.getEvents(settings.apiKey, settings.teamSlug);
-      })
+    TitoAdminApi.getEvents(settings.apiKey, settings.teamSlug)
       .then((response) => {
         if (response.status === 200) {
           setEvents(response.data.events);
@@ -36,7 +33,7 @@ export default function Events() {
       .finally(() => {
         setIsLoading(false);
       });
-  }, []);
+  }, [settings.apiKey, settings.teamSlug]);
 
   return (
     <View style={{ flex: 1, alignItems: 'center', justifyContent: 'center' }}>
