@@ -18,9 +18,7 @@ export default function Dashboard() {
   const { data, error, isLoading } = useQuery<CheckinList, AxiosError>(
     ['checkinList', settings.checkinListSlug],
     async () => {
-      console.log('fetching checkin list');
       const response = await TitoCheckInApi.getList(settings.checkinListSlug);
-      console.log(response.data);
       return response.data;
     },
     { enabled: !!settings.checkinListSlug },
