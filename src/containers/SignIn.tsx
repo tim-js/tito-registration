@@ -24,7 +24,7 @@ export default function SignIn() {
 
       if (response.status === 200) {
         await setSettings({ ...settings, apiKey, teamSlug });
-        navigation.navigate('Main', { screen: 'Events' });
+        navigation.navigate('Events');
       }
     } catch (e) {
       Alert.alert('Invalid Credentials');

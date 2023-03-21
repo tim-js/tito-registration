@@ -1,49 +1,35 @@
-import { useEffect, useState } from 'react';
-import { StyleSheet, View, Text, ScrollView, Alert } from 'react-native';
+import { StyleSheet, View, Text, ScrollView } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { ListItem } from 'react-native-elements';
 import Constants from 'expo-constants';
-import TitoAdminApi from '../services/TitoAdminApi';
+import TitoAdminApi, { CheckinListSummary } from '../services/TitoAdminApi';
 import Loader from '../components/Loader';
 import useAccountSettings from '../hooks/useAccountSettings';
 import { RootStackParams } from '../routers/MainStackNavigation';
+import { useQuery } from '@tanstack/react-query';
+import { AxiosError } from 'axios';
 
 export default function CheckinList() {
-  const [isLoading, setIsLoading] = useState(false);
-  const [error, setError] = useState(null);
-  const [checkInLists, setCheckInLists] = useState([]);
-
   const { settings, setSettings } = useAccountSettings();
 
   const navigation =
     useNavigation<NativeStackNavigationProp<RootStackParams, 'Main'>>();
 
-  useEffect(() => {
-    setIsLoading(true);
-
-    if (!settings.apiKey) {
-      return;
-    }
-
-    TitoAdminApi.getCheckinLists(
-      settings.apiKey,
-      settings.teamSlug,
-      settings.eventSlug,
-    )
-      .then((response) => {
-        if (response.status === 200) {
-          setCheckInLists(response.data.checkin_lists);
-          setError(null);
-        }
-      })
-      .catch((e) => {
-        setError(e.message);
-      })
-      .finally(() => {
-        setIsLoading(false);
-      });
-  }, [settings.apiKey, settings.eventSlug, settings.teamSlug]);
+  const { data, error, isLoading } = useQuery<CheckinListSummary[], AxiosError>(
+    ['checkinLists', settings.apiKey, settings.teamSlug, settings.eventSlug],
+    async () => {
+      const response = await TitoAdminApi.getCheckinLists(
+        settings.apiKey,
+        settings.teamSlug,
+        settings.eventSlug,
+      );
+      return response.data.checkin_lists;
+    },
+    {
+      enabled: !!settings.apiKey && !!settings.teamSlug && !!settings.eventSlug,
+    },
+  );
 
   return (
     <View style={{ flex: 1, alignItems: 'center', justifyContent: 'center' }}>
@@ -52,14 +38,14 @@ export default function CheckinList() {
       {isLoading ? (
         <Loader />
       ) : error === null ? (
-        _renderList(checkInLists)
+        _renderList(data)
       ) : (
-        <Text>{error}</Text>
+        <Text>{error.message}</Text>
       )}
     </View>
   );
 
-  function _renderList(list: any[]) {
+  function _renderList(list: CheckinListSummary[]) {
     if (!list.length) {
       return <Text>No check in lists found</Text>;
     }
@@ -96,18 +82,8 @@ export default function CheckinList() {
   }
 
   async function saveCheckinListSlug(checkinListSlug: string) {
-    setIsLoading(true);
-    try {
-      await setSettings({ ...settings, checkinListSlug });
-      setError(null);
-
-      navigation.navigate('Main', { screen: 'Dashboard' });
-    } catch (e) {
-      setError(e.message);
-      Alert.alert('Something went wrong, please try again.');
-    } finally {
-      setIsLoading(false);
-    }
+    await setSettings({ ...settings, checkinListSlug });
+    navigation.navigate('Main', { screen: 'Dashboard' });
   }
 }
 

@@ -1,4 +1,4 @@
-import { useEffect } from 'react';
+import { useCallback, useEffect } from 'react';
 import {
   createNativeStackNavigator,
   NativeStackNavigationOptions,
@@ -9,9 +9,13 @@ import { isSignedIn } from '../auth';
 import SignIn from '../containers/SignIn';
 import BottomTabsNavigation from './BottomTabsNavigation';
 import useAccountSettings from '../hooks/useAccountSettings';
+import Events from '../containers/Events';
+import CheckinList from '../containers/CheckinList';
 
 export type RootStackParams = {
   SignIn: undefined;
+  Events: undefined;
+  CheckinList: undefined;
   Main: { screen: 'Dashboard' | 'Events' | 'CheckinList' | 'Scan' };
 };
 
@@ -28,16 +32,18 @@ function RootStackNavigator() {
     useNavigation<NativeStackNavigationProp<RootStackParams, 'Main'>>();
   const { getSettings } = useAccountSettings();
 
+  const handleSignIn = useCallback(async () => {
+    const signedIn = await isSignedIn();
+    if (signedIn) {
+      await getSettings();
+      navigation.navigate('Main', { screen: 'Dashboard' });
+    } else {
+      navigation.navigate('SignIn');
+    }
+  }, [getSettings, navigation]);
+
   useEffect(() => {
-    isSignedIn()
-      .then((res) => {
-        if (res) {
-          return getSettings();
-        }
-      })
-      .then(() => {
-        navigation.navigate('Main', { screen: 'Dashboard' });
-      });
+    handleSignIn();
   }, []);
 
   return (
@@ -47,6 +53,8 @@ function RootStackNavigator() {
         component={SignIn}
         options={{ title: 'Tito CheckIn' }}
       />
+      <Stack.Screen name="Events" component={Events} />
+      <Stack.Screen name="CheckinList" component={CheckinList} />
       <Stack.Screen
         name="Main"
         component={BottomTabsNavigation}

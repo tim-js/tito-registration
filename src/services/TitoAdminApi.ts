@@ -1,6 +1,17 @@
 import Api from './Api';
 import config from '../config';
 
+export type Event = {
+  slug: string;
+  title: string;
+  description: string;
+};
+
+export type CheckinListSummary = {
+  title: string;
+  slug: string;
+};
+
 export default class TitoAdminApi {
   static getEvents(apiKey: string, teamSlug: string) {
     return Api.get(
