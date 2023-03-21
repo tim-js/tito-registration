@@ -6,6 +6,9 @@ import accountSettingsContext, {
   AccountSettings,
 } from './src/contexts/accountSettingsContext';
 import Storage from './src/services/Storage';
+import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
+
+const queryClient = new QueryClient();
 
 export default function App() {
   const [accountSettings, setAccountSettings] = useState<AccountSettings>({
@@ -25,26 +28,28 @@ export default function App() {
   };
 
   return (
-    <accountSettingsContext.Provider
-      value={{
-        settings: accountSettings,
-        setSettings: persistAccountSettings,
-        getSettings: loadAccountSettings,
-        clearSettings: async () => {
-          await Storage.clearAccountSettings();
-          setAccountSettings({
-            apiKey: null,
-            teamSlug: null,
-            checkinListSlug: null,
-            eventSlug: null,
-          });
-        },
-      }}>
-      <ThemeProvider>
-        <NavigationContainer>
-          <MainStackNavigation />
-        </NavigationContainer>
-      </ThemeProvider>
-    </accountSettingsContext.Provider>
+    <QueryClientProvider client={queryClient}>
+      <accountSettingsContext.Provider
+        value={{
+          settings: accountSettings,
+          setSettings: persistAccountSettings,
+          getSettings: loadAccountSettings,
+          clearSettings: async () => {
+            await Storage.clearAccountSettings();
+            setAccountSettings({
+              apiKey: null,
+              teamSlug: null,
+              checkinListSlug: null,
+              eventSlug: null,
+            });
+          },
+        }}>
+        <ThemeProvider>
+          <NavigationContainer>
+            <MainStackNavigation />
+          </NavigationContainer>
+        </ThemeProvider>
+      </accountSettingsContext.Provider>
+    </QueryClientProvider>
   );
 }

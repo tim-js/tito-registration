@@ -1,9 +1,8 @@
-import { useCallback, useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useNavigation } from '@react-navigation/native';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
-import { AccountSettings } from '../contexts/accountSettingsContext';
 import useAccountSettings from '../hooks/useAccountSettings';
-import TitoCheckInApi from '../services/TitoCheckInApi';
+import TitoCheckInApi, { CheckinList } from '../services/TitoCheckInApi';
 import TitoAdminApi from '../services/TitoAdminApi';
 import { Alert, View, Text, Modal, StyleSheet } from 'react-native';
 import { Button } from 'react-native-elements';
@@ -12,35 +11,36 @@ import Loader from '../components/Loader';
 import { BarCodeScanner } from 'expo-barcode-scanner';
 import { Ionicons } from '@expo/vector-icons';
 import { Camera } from 'expo-camera';
+import { QueryClient, useQuery, useQueryClient } from '@tanstack/react-query';
+import { AxiosError } from 'axios';
 
 export default function Scan() {
-  const [isLoading, setIsLoading] = useState(false);
-  const [totalPages, setTotalPages] = useState(1);
   const [scanned, setScanned] = useState(false);
-  const [scanResult, setScanResult] = useState('');
-  const [error, setError] = useState(null);
   const [ticket, setTicket] = useState(null);
-  const [checkIns, setCheckIns] = useState([]);
   const [checkinAvailable, setCheckinAvailable] = useState(null);
   const [modalVisible, setModalVisible] = useState(false);
 
   const [permission, requestPermission] = Camera.useCameraPermissions();
+  useEffect(() => {
+    requestPermission();
+  }, [requestPermission]);
 
   const { settings } = useAccountSettings();
 
-  const loadData = useCallback(async () => {
-    setIsLoading(true);
-    await getPages(settings);
-    setIsLoading(false);
-  }, [settings]);
-
-  useEffect(() => {
-    loadData();
-    requestPermission();
-  }, [loadData, requestPermission]);
+  const { data, error, isLoading } = useQuery<CheckinList, AxiosError>(
+    ['checkinList', settings.checkinListSlug],
+    async () => {
+      const response = await TitoCheckInApi.getList(settings.checkinListSlug);
+      return response.data;
+    },
+    { enabled: !!settings.checkinListSlug },
+  );
+  const totalPages = data.total_checkin_pages;
 
   const navigation =
     useNavigation<NativeStackNavigationProp<RootStackParams, 'Main'>>();
+
+  const queryClient = useQueryClient();
 
   return (
     <View style={{ flex: 1, alignItems: 'center', justifyContent: 'center' }}>
@@ -101,7 +101,7 @@ export default function Scan() {
                         width: '100%',
                         flexShrink: 1,
                       }}>
-                      {error ? error : 'Already Checked In'}
+                      {error ? error.message : 'Already Checked In'}
                     </Text>
                   )
                 ) : (
@@ -114,7 +114,7 @@ export default function Scan() {
                       width: '100%',
                       flexShrink: 1,
                     }}>
-                    {error ? error : 'No ticket data'}
+                    {error ? error.message : 'No ticket data'}
                   </Text>
                 )}
               </View>
@@ -135,17 +135,9 @@ export default function Scan() {
     </View>
   );
 
-  async function getPages(settings: AccountSettings) {
-    const results = await TitoCheckInApi.getList(settings.checkinListSlug);
-    setTotalPages(results.data.total_checkin_pages);
-  }
-
   async function handleBarCodeRead(qrData) {
     setScanned(true);
-    setIsLoading(true);
     showModal();
-
-    setScanResult(qrData);
 
     const splicedURI = qrData.data.split('/');
     const slug = splicedURI[splicedURI.length - 1];
@@ -160,11 +152,8 @@ export default function Scan() {
       );
     } catch (e) {
       Alert.alert('The ticket was not found for this event');
-      setError(`Ticket not found`);
 
-      setIsLoading(false);
       setTicket(null);
-      setCheckIns([]);
       setCheckinAvailable(null);
 
       return;
@@ -177,16 +166,12 @@ export default function Scan() {
     try {
       await TitoCheckInApi.getTicket(settings.checkinListSlug, ticket.slug);
       isCheckedIn = getTicketStatus(checkIns, ticket.id);
-      setError(null);
     } catch (e) {
       Alert.alert('The ticket is not from this checkin list');
-      setError(`Not found in this checkin list`);
       ticket = null;
     }
 
-    setIsLoading(false);
     setTicket(ticket);
-    setCheckIns(checkIns);
     setCheckinAvailable(!isCheckedIn);
   }
 
@@ -210,11 +195,8 @@ export default function Scan() {
 
   function hideModal() {
     setModalVisible(false);
-    setScanResult('');
     setTicket(null);
     setCheckinAvailable(null);
-    setError(null);
-    setIsLoading(false);
     setScanned(false);
   }
 
@@ -247,13 +229,14 @@ export default function Scan() {
               );
 
               hideModal();
-              setError(null);
+              queryClient.invalidateQueries([
+                'checkinList',
+                settings.checkinListSlug,
+              ]);
 
               navigation.navigate('Main', { screen: 'Dashboard' });
             } catch (e) {
-              setError(e.message);
-            } finally {
-              setIsLoading(false);
+              Alert.alert(e.message);
             }
           },
         },

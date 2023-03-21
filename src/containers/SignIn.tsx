@@ -8,8 +8,8 @@ import TitoAdminApi from '../services/TitoAdminApi';
 import { RootStackParams } from '../routers/MainStackNavigation';
 
 export default function SignIn() {
-  const [apiKey, setApiKey] = useState('');
-  const [teamSlug, setTeamSlug] = useState('');
+  const [apiKey, setApiKey] = useState('secret_live_kBSSKszg7XcZm-zuiwMD');
+  const [teamSlug, setTeamSlug] = useState('revojs');
   const [isLoading, setIsLoading] = useState(false);
 
   const { settings, setSettings } = useAccountSettings();
@@ -24,7 +24,7 @@ export default function SignIn() {
 
       if (response.status === 200) {
         await setSettings({ ...settings, apiKey, teamSlug });
-        navigation.navigate('Main', { screen: 'Events' });
+        navigation.navigate('Events');
       }
     } catch (e) {
       Alert.alert('Invalid Credentials');

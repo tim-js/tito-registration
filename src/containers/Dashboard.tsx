@@ -1,52 +1,37 @@
-import { useEffect, useState } from 'react';
 import { Text, View, StyleSheet, TouchableOpacity } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import Loader from '../components/Loader';
 import useAccountSettings from '../hooks/useAccountSettings';
-import TitoCheckInApi from '../services/TitoCheckInApi';
+import TitoCheckInApi, { CheckinList } from '../services/TitoCheckInApi';
 import { RootStackParams } from '../routers/MainStackNavigation';
 import { Button } from 'react-native-elements';
+import { useQuery } from '@tanstack/react-query';
+import { AxiosError } from 'axios';
 
 export default function Dashboard() {
-  const [isLoading, setIsLoading] = useState(false);
-  const [error, setError] = useState(null);
-  const [checkInList, setCheckInList] = useState({
-    title: '',
-    slug: '',
-    checkins_count: 0,
-    tickets_count: 0,
-  });
-
   const navigation =
     useNavigation<NativeStackNavigationProp<RootStackParams, 'Main'>>();
 
   const { settings, clearSettings } = useAccountSettings();
 
-  useEffect(() => {
-    if (!settings.checkinListSlug) {
-      setError(
-        'No CheckIn List selected. Go to the Checkin List and select one.',
-      );
-      return;
-    }
+  const { data, error, isLoading } = useQuery<CheckinList, AxiosError>(
+    ['checkinList', settings.checkinListSlug],
+    async () => {
+      console.log('fetching checkin list');
+      const response = await TitoCheckInApi.getList(settings.checkinListSlug);
+      console.log(response.data);
+      return response.data;
+    },
+    { enabled: !!settings.checkinListSlug },
+  );
 
-    TitoCheckInApi.getList(settings.checkinListSlug)
-      .then((response) => {
-        if (response.status === 200) {
-          setCheckInList(response.data);
-          setError(null);
-        }
-      })
-      .catch((e) => {
-        setError(e.message);
-      })
-      .finally(() => {
-        setIsLoading(false);
-      });
-  }, [settings]);
-
-  const { title, slug, checkins_count, tickets_count } = checkInList;
+  const { title, slug, checkins_count, tickets_count } = data || {
+    title: '',
+    slug: '',
+    checkins_count: 0,
+    tickets_count: 0,
+  };
 
   const percent =
     tickets_count > 0 ? (checkins_count * 100) / tickets_count : 0;
@@ -56,7 +41,12 @@ export default function Dashboard() {
   }
 
   if (error) {
-    return renderError(error);
+    return renderError(error.message);
+  }
+  if (!settings.checkinListSlug) {
+    return renderError(
+      'No CheckIn List selected. Go to the Checkin List and select one.',
+    );
   }
 
   return (
@@ -73,8 +63,8 @@ export default function Dashboard() {
 
       <View>
         <TouchableOpacity
-          onPress={() =>
-            navigation.navigate('Main', { screen: 'CheckinList' })
+          onPress={
+            () => {} // navigation.navigate('Main', { screen: 'CheckinList' })
           }>
           <Text style={styles.nrCheckins}>{checkins_count}</Text>
           <Text style={styles.label}>Checkins</Text>

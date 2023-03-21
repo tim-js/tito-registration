@@ -1,44 +1,37 @@
-import { useEffect, useState } from 'react';
 import { StyleSheet, View, Text, ScrollView, Alert } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { ListItem } from 'react-native-elements';
 import Constants from 'expo-constants';
-import TitoAdminApi from '../services/TitoAdminApi';
+import TitoAdminApi, { Event } from '../services/TitoAdminApi';
 import useAccountSettings from '../hooks/useAccountSettings';
 import { RootStackParams } from '../routers/MainStackNavigation';
 import Loader from '../components/Loader';
+import { useQuery } from '@tanstack/react-query';
+import { AxiosError } from 'axios';
 
 export default function Events() {
-  const [isLoading, setIsLoading] = useState(false);
-  const [error, setError] = useState(null);
-  const [events, setEvents] = useState([]);
-
   const { settings, setSettings } = useAccountSettings();
 
   const navigation =
     useNavigation<NativeStackNavigationProp<RootStackParams, 'Main'>>();
 
-  useEffect(() => {
-    if (!settings.apiKey) {
-      return;
-    }
-
-    TitoAdminApi.getEvents(settings.apiKey, settings.teamSlug)
-      .then((response) => {
-        if (response.status === 200) {
-          setEvents(response.data.events);
-          setError(null);
-        }
-      })
-      .catch((e) => {
-        setError(e.message);
+  const { data, error, isLoading } = useQuery<Event[], AxiosError>(
+    ['events', settings.apiKey, settings.teamSlug],
+    async () => {
+      const response = await TitoAdminApi.getEvents(
+        settings.apiKey,
+        settings.teamSlug,
+      );
+      return response.data.events;
+    },
+    {
+      enabled: !!settings.apiKey && !!settings.teamSlug,
+      onError: () => {
         Alert.alert('Invalid Credentials');
-      })
-      .finally(() => {
-        setIsLoading(false);
-      });
-  }, [settings.apiKey, settings.teamSlug]);
+      },
+    },
+  );
 
   return (
     <View style={{ flex: 1, alignItems: 'center', justifyContent: 'center' }}>
@@ -47,14 +40,14 @@ export default function Events() {
       {isLoading ? (
         <Loader />
       ) : error === null ? (
-        _renderList(events)
+        _renderList(data)
       ) : (
-        <Text>{error}</Text>
+        <Text>{error.message}</Text>
       )}
     </View>
   );
 
-  function _renderList(list: any[]) {
+  function _renderList(list: Event[]) {
     if (!list.length) {
       return <Text>No upcoming events</Text>;
     }
@@ -91,19 +84,9 @@ export default function Events() {
   }
 
   async function saveEvent(eventSlug: string) {
-    setIsLoading(true);
+    await setSettings({ ...settings, eventSlug });
 
-    try {
-      await setSettings({ ...settings, eventSlug });
-      setError(null);
-
-      navigation.navigate('Main', { screen: 'CheckinList' });
-    } catch (e) {
-      setError(e.message);
-      Alert.alert('Something went wrong, please try again.');
-    } finally {
-      setIsLoading(false);
-    }
+    navigation.navigate('CheckinList');
   }
 }
 
