@@ -8,8 +8,8 @@ import TitoAdminApi from '../services/TitoAdminApi';
 import { RootStackParams } from '../routers/MainStackNavigation';
 
 export default function SignIn() {
-  const [apiKey, setApiKey] = useState('');
-  const [teamSlug, setTeamSlug] = useState('');
+  const [apiKey, setApiKey] = useState('secret_live_kBSSKszg7XcZm-zuiwMD');
+  const [teamSlug, setTeamSlug] = useState('revojs');
   const [isLoading, setIsLoading] = useState(false);
 
   const { settings, setSettings } = useAccountSettings();
