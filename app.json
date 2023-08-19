@@ -13,18 +13,26 @@
       "hideExponentText": false
     },
     "packagerOpts": {
-      "assetExts": [
-        "ttf",
-        "mp4",
-        "otf",
-        "xml"
-      ]
+      "assetExts": ["ttf", "mp4", "otf", "xml"]
     },
     "plugins": [
       [
         "expo-camera",
         {
           "cameraPermission": "Allow $(PRODUCT_NAME) to access your camera."
+        }
+      ],
+      [
+        "expo-build-properties",
+        {
+          "android": {
+            "compileSdkVersion": 33,
+            "targetSdkVersion": 33,
+            "buildToolsVersion": "33.0.0"
+          },
+          "ios": {
+            "deploymentTarget": "13.0"
+          }
         }
       ]
     ],
@@ -44,10 +52,7 @@
         "android.permission.RECORD_AUDIO"
       ]
     },
-    "platforms": [
-      "android",
-      "ios"
-    ],
+    "platforms": ["android", "ios"],
     "extra": {
       "eas": {
         "projectId": "c69323c0-b9bd-11e9-ae2d-d7c1cd1c14c7"
