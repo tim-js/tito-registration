@@ -1,11 +1,11 @@
 # tito Registration App
 
- Improved checkin app for [ti.to](https://ti.to/) events, based on the order number, which is an auto-increment.
- 
+Improved checkin app for [ti.to](https://ti.to/) events, based on the order number, which is an auto-increment.
+
 - Google Play: https://play.google.com/store/apps/details?id=com.revojs.registration
 - App Store: https://apps.apple.com/us/app/ti-to-registration/id1483743059
- 
- Built with React Native, using Expo.
+
+Built with React Native, using Expo.
 
 ## Usage
 
@@ -16,6 +16,7 @@ Cheackout our in-depth article on how to use this app and how to get a [Queueles
 To run the app there follow the instructions from [expo-cli](https://docs.expo.dev/).
 
 Then run:
+
 ```
 - npm run android
 - npm run ios
@@ -27,15 +28,18 @@ Then run:
 To create a build, run:
 
 ```
-expo build:ios
-expo build:android
+eas build -p ios
+eas build -p android
 ```
 
 For iOS, validate the build:
+
 ```
 xcrun altool --validate-app -f [build_name.ipa] -t ios -u [email] -p [password]
 ```
+
 To upload the build on TestFlight:
+
 ```
 xcrun altool --upload-app -f [build_name.ipa] -t ios -u [email] -p [password]
 ```
